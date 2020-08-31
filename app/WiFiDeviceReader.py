@@ -53,15 +53,17 @@ class WiFiDeviceReader:
 		gps_message = gps_message.decode('utf-8').strip()
 		if gps_message == "":
 			return
+
 		# convert to dictionary
 		gps_data = self.process_gps_data(gps_message)
 		if gps_data is None:
 			return
+		print(gps_message)
 
 		# check gps connection
 		if '*' in gps_data.get('latitude'):
+			print('fail here')
 			return
-		print(gps_message)
 
 		# set data
 		self.gps_data = gps_data
