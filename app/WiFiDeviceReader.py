@@ -1,0 +1,160 @@
+# !/usr/bin/env python
+
+import serial
+
+from app.DeviceCache import DeviceCache
+from app.SQLiteProcessor import SQLiteProcessor
+import time
+
+
+class WiFiDeviceReader:
+
+	gps_serial_reader = None
+	gps_data = None
+	gps_data_age = None
+
+	wifi_serial_reader = None
+	wifi_data = None
+
+	gps_is_on = False
+
+	def __init__(self, wifi_serial_port, gps_serial_port, database_location):
+		# set serial
+		self.set_wifi_serial(wifi_serial_port)
+		self.set_gps_serial(gps_serial_port)
+
+		# set cache
+		self.cache = DeviceCache()
+
+		# set SQLite processor
+		self.sqlite_processor = SQLiteProcessor(database_location=database_location, run_setup=True)
+
+
+	# GPS data
+	def set_gps_serial(self, gps_serial_port):
+		if gps_serial_port is None:
+			return
+
+		self.gps_serial_reader = serial.Serial(
+			port=gps_serial_port,
+			baudrate=9600,
+			parity=serial.PARITY_NONE,
+			stopbits=serial.STOPBITS_ONE,
+			bytesize=serial.EIGHTBITS,
+			timeout=1
+		)
+
+	def set_gps_data(self):
+		# clear GPS data.
+		self.gps_data = None
+
+		# get the string
+		gps_message = self.gps_serial_reader.readline()
+		gps_message = gps_message.decode(('utf-8').strip())
+		if gps_message == "":
+			return
+
+		# convert to dictionary
+		gps_data = self.process_gps_data(gps_message)
+		if gps_data is None:
+			return
+
+		# check gps connection
+		if '*' in gps_data.get('latitude'):
+			return
+
+		# set data
+		self.gps_data = gps_data
+
+	@staticmethod
+	def process_gps_data(gps_data):
+		gps_array = [x for x in gps_data.strip().split(' ') if x != '']
+		return {
+			"satellites": gps_array[0],
+			"hdop": gps_array[1],
+			"latitude": gps_array[2],
+			"longitude": gps_array[3],
+			"date": gps_array[5],
+			"time": gps_array[6],
+			"altitude": gps_array[7],
+			"degree": gps_array[8],
+			"speed": gps_array[9]
+		}
+
+	# WiFi data
+	def set_wifi_serial(self, wifi_serial_port):
+		if wifi_serial_port is None:
+			return
+
+		self.wifi_serial_reader = serial.Serial(
+			port=wifi_serial_port,
+			baudrate=9600,
+			parity=serial.PARITY_NONE,
+			stopbits=serial.STOPBITS_ONE,
+			bytesize=serial.EIGHTBITS,
+			timeout=1
+		)
+
+	def set_wifi_data(self):
+		# clear WiFi variable
+		self.wifi_data = None
+
+		# get the string
+		wifi_message = self.wifi_serial_reader.readline()
+		wifi_message = wifi_message.decode(('utf-8').strip())
+		if wifi_message == "":
+			return
+
+		# convert to dictionary
+		wifi_data = self.process_wifi_data(wifi_message)
+		if wifi_data is None:
+			return
+
+		# check cache
+		if self.cache.is_in_cache(wifi_data.get('mac_address')):
+			return None
+
+		# set WiFi data
+		self.wifi_data = wifi_data
+
+	@staticmethod
+	def process_wifi_data(wifi_data):
+		wifi_array = wifi_data.strip().replace("\n", "").split('|')
+		return {
+			"mac_address": wifi_array[0],
+			"ssid": wifi_array[1],
+			"rssi": wifi_array[2]
+		}
+
+	# All data
+	def process_collected_data(self):
+		collected_data = {**self.gps_data, **self.wifi_data}
+		cleaned_data = {key: value if value != '' else None for key, value in collected_data.items()}
+		self.sqlite_processor.insert_into_sqlite(cleaned_data)
+
+	def process_serial_input(self):
+		while True:
+			try:
+				self.set_gps_data()
+				if self.gps_data is None:
+					continue
+
+				self.set_wifi_data()
+				if self.wifi_data is None:
+					continue
+
+				self.process_collected_data()
+			except Exception as e:
+				continue
+
+	def run(self):
+		try:
+			self.process_serial_input()
+		except KeyboardInterrupt as ki:
+			pass
+		except Exception as e:
+			with open('errorlog.txt', 'w') as error_log:
+				print(e)
+				error_log.write(str(e))
+		finally:
+			self.sqlite_processor.close_connection()
