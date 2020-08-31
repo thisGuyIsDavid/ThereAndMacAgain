@@ -58,11 +58,9 @@ class WiFiDeviceReader:
 		gps_data = self.process_gps_data(gps_message)
 		if gps_data is None:
 			return
-		print(gps_message)
 
 		# check gps connection
 		if '*' in gps_data.get('latitude'):
-			print('fail here')
 			return
 
 		# set data
@@ -124,8 +122,7 @@ class WiFiDeviceReader:
 	def process_collected_data(self):
 		collected_data = {**self.gps_data, **self.wifi_data}
 		cleaned_data = {key: value if value != '' else None for key, value in collected_data.items()}
-		print(cleaned_data)
-		#	self.sqlite_processor.insert_into_sqlite(cleaned_data)
+		self.sqlite_processor.insert_into_sqlite(cleaned_data)
 
 	def process_serial_input(self):
 		while True:
