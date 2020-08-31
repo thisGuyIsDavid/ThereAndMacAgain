@@ -37,7 +37,7 @@ class WiFiDeviceReader:
 
 		self.gps_serial_reader = serial.Serial(
 			port=gps_serial_port,
-			baudrate=9600,
+			baudrate=115200,
 			parity=serial.PARITY_NONE,
 			stopbits=serial.STOPBITS_ONE,
 			bytesize=serial.EIGHTBITS,
@@ -50,7 +50,7 @@ class WiFiDeviceReader:
 
 		# get the string
 		gps_message = self.gps_serial_reader.readline()
-		gps_message = gps_message.decode(('utf-8').strip())
+		gps_message = gps_message.decode('utf-8').strip()
 		if gps_message == "":
 			return
 
@@ -70,15 +70,9 @@ class WiFiDeviceReader:
 	def process_gps_data(gps_data):
 		gps_array = [x for x in gps_data.strip().split(' ') if x != '']
 		return {
-			"satellites": gps_array[0],
-			"hdop": gps_array[1],
-			"latitude": gps_array[2],
-			"longitude": gps_array[3],
-			"date": gps_array[5],
-			"time": gps_array[6],
-			"altitude": gps_array[7],
-			"degree": gps_array[8],
-			"speed": gps_array[9]
+			"latitude": gps_array[0],
+			"longitude": gps_array[1],
+			"date": gps_array[2]
 		}
 
 	# WiFi data
@@ -88,7 +82,7 @@ class WiFiDeviceReader:
 
 		self.wifi_serial_reader = serial.Serial(
 			port=wifi_serial_port,
-			baudrate=9600,
+			baudrate=115200,
 			parity=serial.PARITY_NONE,
 			stopbits=serial.STOPBITS_ONE,
 			bytesize=serial.EIGHTBITS,
@@ -121,16 +115,15 @@ class WiFiDeviceReader:
 	def process_wifi_data(wifi_data):
 		wifi_array = wifi_data.strip().replace("\n", "").split('|')
 		return {
-			"mac_address": wifi_array[0],
-			"ssid": wifi_array[1],
-			"rssi": wifi_array[2]
+			"mac_address": wifi_array[0]
 		}
 
 	# All data
 	def process_collected_data(self):
 		collected_data = {**self.gps_data, **self.wifi_data}
 		cleaned_data = {key: value if value != '' else None for key, value in collected_data.items()}
-		self.sqlite_processor.insert_into_sqlite(cleaned_data)
+		print(cleaned_data)
+		#	self.sqlite_processor.insert_into_sqlite(cleaned_data)
 
 	def process_serial_input(self):
 		while True:
