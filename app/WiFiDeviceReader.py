@@ -158,3 +158,4 @@ class WiFiDeviceReader:
 				error_log.write(str(e))
 		finally:
 			self.sqlite_processor.close_connection()
+
