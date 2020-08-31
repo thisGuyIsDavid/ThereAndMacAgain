@@ -95,7 +95,7 @@ class WiFiDeviceReader:
 
 		# get the string
 		wifi_message = self.wifi_serial_reader.readline()
-		wifi_message = wifi_message.decode(('utf-8').strip())
+		wifi_message = wifi_message.decode('utf-8').strip()
 		if wifi_message == "":
 			return
 
