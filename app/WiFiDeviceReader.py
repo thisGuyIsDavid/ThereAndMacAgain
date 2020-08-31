@@ -70,7 +70,7 @@ class WiFiDeviceReader:
 
 	@staticmethod
 	def process_gps_data(gps_data):
-		gps_array = [x for x in gps_data.strip().split(' ') if x != '']
+		gps_array = [x for x in gps_data.strip().split('|') if x != '']
 		return {
 			"latitude": gps_array[0],
 			"longitude": gps_array[1],
