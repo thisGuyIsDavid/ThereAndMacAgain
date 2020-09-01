@@ -6,7 +6,6 @@ import datetime
 class SQLiteProcessor:
 	def __init__(self, database_location, run_setup=False):
 		self.database_connection = sqlite3.connect(database_location)
-
 		if run_setup:
 			self.setup_sqlite()
 

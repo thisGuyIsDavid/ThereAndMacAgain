@@ -2,10 +2,8 @@
 
 import serial
 
-from app.DeviceCache import DeviceCache
 from app.SQLiteProcessor import SQLiteProcessor
-import time
-
+from app.RedisCache import RedisCache
 
 class WiFiDeviceReader:
 
@@ -24,11 +22,10 @@ class WiFiDeviceReader:
 		self.set_gps_serial(gps_serial_port)
 
 		# set cache
-		self.cache = DeviceCache()
+		self.redis_cache = RedisCache()
 
 		# set SQLite processor
 		self.sqlite_processor = SQLiteProcessor(database_location=database_location, run_setup=True)
-
 
 	# GPS data
 	def set_gps_serial(self, gps_serial_port):
@@ -105,8 +102,10 @@ class WiFiDeviceReader:
 			return
 
 		# check cache
-		if self.cache.is_in_cache(wifi_data.get('mac_address')):
-			return None
+		if self.redis_cache.is_key_in_store(wifi_data.get('mac_address')):
+			return
+		else:
+			self.redis_cache.set_key(wifi_data.get('mac_address'), 1, 30)
 
 		# set WiFi data
 		self.wifi_data = wifi_data
