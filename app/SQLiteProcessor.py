@@ -13,7 +13,7 @@ class SQLiteProcessor:
 		cursor = self.database_connection.cursor()
 		cursor.execute("SELECT name FROM sqlite_master WHERE type='table' AND name='mac_data';")
 		if len(cursor.fetchall()) == 0:
-			cursor.execute("CREATE TABLE mac_data(id INTEGER PRIMARY KEY AUTOINCREMENT, message BLOB, date_inserted TEXT);")
+			cursor.execute("CREATE TABLE mac_data(id INTEGER PRIMARY KEY AUTOINCREMENT, mac_address TEXT, latitude TEXT, longitude TEXT, date_inserted TEXT);")
 		self.database_connection.commit()
 
 	def insert_into_sqlite(self, message_dictionary):

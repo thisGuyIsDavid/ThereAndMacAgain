@@ -1,9 +1,11 @@
 import os
-import datetime
+
 import redis
+from rq import Queue
 
 
 class RedisCache:
+    q = None
 
     def get_connection(self):
         return redis.from_url(os.getenv('REDIS_URL', 'redis://localhost:6379'))
@@ -25,11 +27,13 @@ class RedisCache:
         redis_result = self.get_connection().get(key)
         return redis_result is not None
 
-    @staticmethod
-    def flush():
-        conn = redis.from_url(os.getenv('REDIS_URL', 'redis://localhost:6379'))
-        conn.flushdb()
-        conn.flushall()
+    def get_job_queue(self):
+        if self.q is None:
+            self.q = Queue(connection=self.get_connection())
+        return self.q
+
+    def enqueue_job(self, method, arguments, timeout=500):
+        return self.get_job_queue().enqueue_call(method, args=arguments, result_ttl=timeout)
 
 
 if __name__ == '__main__':
