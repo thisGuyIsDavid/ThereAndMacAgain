@@ -47,7 +47,6 @@ class WiFiDeviceReader:
 			bytesize=serial.EIGHTBITS,
 			timeout=1
 		)
-		self.tm_board.leds[0] = True
 
 	def set_gps_data(self):
 		# clear GPS data.
@@ -67,9 +66,6 @@ class WiFiDeviceReader:
 		# check gps connection
 		if '*' in gps_data.get('latitude'):
 			return
-
-		# if this is the first call, record the time.
-
 
 		# set data
 		self.gps_data = gps_data
@@ -137,28 +133,45 @@ class WiFiDeviceReader:
 		else:
 			self.redis_cache.set_key(key_name, 1, 600)
 
+		self.tm_board.leds[3] = True
 		self.sqlite_processor.insert_into_sqlite(cleaned_data)
 		self.number_collected += 1
-		self.tm_board.segments[4] = str(self.number_collected)
-		self.tm_board.leds[0] = True
 
 	def process_serial_input(self):
 		while True:
-			self.tm_board.leds[0] = False
+			# GPS
+			self.tm_board.leds[1] = False
+
+			# Wifi
+			self.tm_board.leds[2] = False
+
+			# General
+			self.tm_board.leds[3] = False
+
 			try:
 				self.set_gps_data()
 				if self.gps_data is None:
 					continue
+				self.tm_board.leds[1] = True
 
 				self.set_wifi_data()
 				if self.wifi_data is None:
 					continue
+				self.tm_board.leds[2] = True
 
 				self.process_collected_data()
-				self.tm_board.leds[1] = True
+
+				self.display_count()
 			except Exception as e:
 				print(e)
 				continue
+
+	def display_count(self):
+		number_collected_string = str(self.number_collected)
+		if len(number_collected_string) > 4:
+			self.tm_board.segments[4] = '9999'
+		else:
+			self.tm_board.segments[4] = "%s%s" % ("0" * (4 - len(str(self.number_collected))), self.number_collected)
 
 	def run(self):
 		try:
@@ -172,6 +185,3 @@ class WiFiDeviceReader:
 		finally:
 			self.sqlite_processor.close_connection()
 
-
-if __name__ == '__main__':
-    pass
