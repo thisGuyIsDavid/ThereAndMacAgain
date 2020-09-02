@@ -160,33 +160,16 @@ class WiFiDeviceReader:
 				self.process_collected_data()
 
 				self.display_count()
-				self.display_average()
 			except Exception as e:
 				print(e)
 				continue
 
 	def display_count(self):
 		number_collected_string = str(self.number_collected)
-		if len(number_collected_string) > 4:
+		if len(number_collected_string) > 8:
 			self.tm_board.segments[0] = '9999'
 		else:
-			self.tm_board.segments[0] = "%s%s" % ("0" * (4 - len(str(self.number_collected))), self.number_collected)
-
-
-	def display_average(self):
-		seconds_since_start = round(time.time() - self.when_started)
-		# Avoid division by zero
-		if seconds_since_start == 0:
-			return
-
-		average = self.number_collected / seconds_since_start
-		if average < 1:
-			average = round(average, 3)
-		else:
-			average = round(average, 1)
-
-		average_string = str(average)
-		self.tm_board.segments[4] = "%s%s" % ("0" * (5 - len(str(average_string))), average_string)
+			self.tm_board.segments[0] = "%s%s" % ("0" * (8 - len(str(self.number_collected))), self.number_collected)
 
 
 	def run(self):
