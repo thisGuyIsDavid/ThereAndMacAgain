@@ -154,8 +154,8 @@ class WiFiDeviceReader:
 		except KeyboardInterrupt as ki:
 			pass
 		except Exception as e:
+			print(e)
 			with open('errorlog.txt', 'w') as error_log:
-				print(e)
 				error_log.write(str(e))
 		finally:
 			self.sqlite_processor.close_connection()
