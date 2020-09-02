@@ -70,8 +70,8 @@ class WiFiDeviceReader:
 		latitude = round(float(gps_array[0]), 4)
 		longitude = round(float(gps_array[1]), 4)
 		return {
-			"latitude": latitude,
-			"longitude": longitude,
+			"latitude": str(latitude),
+			"longitude": str(longitude),
 			"timestamp": gps_array[2]
 		}
 
