@@ -128,10 +128,12 @@ class WiFiDeviceReader:
 			try:
 				self.set_gps_data()
 				if self.gps_data is None:
+					print('no gps data')
 					continue
 
 				self.set_wifi_data()
 				if self.wifi_data is None:
+					print('no wifi data')
 					continue
 
 				self.process_collected_data()
