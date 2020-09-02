@@ -1,9 +1,19 @@
 # !/usr/bin/env python
-
+from app.displays.TMBoards import TMBoards
 import serial
 
 from app.SQLiteProcessor import SQLiteProcessor
 from app.RedisCache import RedisCache
+import time
+
+TM.leds[3] = True
+TM.leds[0] = True
+
+for i in range(100):
+        TM.segments[0] = str(i)
+        time.sleep(1)
+a = TM.switches[2]
+
 
 
 class WiFiDeviceReader:
@@ -25,6 +35,9 @@ class WiFiDeviceReader:
 		# set cache
 		self.redis_cache = RedisCache()
 
+		# set display
+		self.tm_board = TMBoards(19, 13, 6, 1)
+
 		# set SQLite processor
 		self.sqlite_processor = SQLiteProcessor(database_location=database_location, run_setup=True)
 
@@ -41,6 +54,7 @@ class WiFiDeviceReader:
 			bytesize=serial.EIGHTBITS,
 			timeout=1
 		)
+		self.tm_board.leds[0] = True
 
 	def set_gps_data(self):
 		# clear GPS data.
@@ -88,6 +102,7 @@ class WiFiDeviceReader:
 			bytesize=serial.EIGHTBITS,
 			timeout=1
 		)
+		self.tm_board.leds[2] = True
 
 	def set_wifi_data(self):
 		# clear WiFi variable
@@ -119,29 +134,29 @@ class WiFiDeviceReader:
 		collected_data = {**self.gps_data, **self.wifi_data}
 		cleaned_data = {key: value if value != '' else None for key, value in collected_data.items()}
 		key_name = "%s_%s_%s" % (cleaned_data.get('mac_address'), cleaned_data.get('latitude'), cleaned_data.get('longitude'))
+
 		# check cache
 		if self.redis_cache.is_key_in_store(key_name):
 			return
 		else:
 			self.redis_cache.set_key(key_name, 1, 600)
-
-		print(key_name)
 		self.sqlite_processor.insert_into_sqlite(cleaned_data)
+		self.tm_board.leds[0] = True
 
 	def process_serial_input(self):
 		while True:
+			self.tm_board.leds[0] = False
 			try:
 				self.set_gps_data()
 				if self.gps_data is None:
-					print('no gps data')
 					continue
 
 				self.set_wifi_data()
 				if self.wifi_data is None:
-					print('no wifi data')
 					continue
 
 				self.process_collected_data()
+				self.tm_board.leds[1] = True
 			except Exception as e:
 				print(e)
 				continue
@@ -157,7 +172,3 @@ class WiFiDeviceReader:
 				error_log.write(str(e))
 		finally:
 			self.sqlite_processor.close_connection()
-
-
-def process_reading(json):
-	print(json)

@@ -25,7 +25,6 @@ class SQLiteProcessor:
 			)
 			""" % (message_dictionary.get('mac_address'), message_dictionary.get('latitude'), message_dictionary.get('longitude'), message_dictionary.get('timestamp'))
 		)
-		print(message_dictionary)
 		cursor.close()
 		self.database_connection.commit()
 
@@ -34,14 +33,14 @@ class SQLiteProcessor:
 
 	def get_data(self):
 		cursor = self.database_connection.cursor()
-		cursor.execute("SELECT * FROM mac_data")
-		x = cursor.fetchall()
+		cursor.execute("SELECT mac_address, latitude, longitude, timestamp FROM mac_data")
+		results = cursor.fetchall()
 		cursor.close()
-		print(x)
-
-		pass
-
-
-if __name__ == '__main__':
-	SQLiteProcessor('/Users/davidhaverberg/PycharmProjects/ThereAndMacAgain/data.db').get_data()
-	pass
+		return [
+			{
+				"mac_address": result[0],
+				"latitude": result[1],
+				"longitude": result[2],
+				"timestamp": result[3]
+			} for result in results
+		]
