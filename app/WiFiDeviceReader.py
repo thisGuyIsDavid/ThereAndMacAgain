@@ -6,15 +6,6 @@ from app.SQLiteProcessor import SQLiteProcessor
 from app.RedisCache import RedisCache
 import time
 
-TM.leds[3] = True
-TM.leds[0] = True
-
-for i in range(100):
-        TM.segments[0] = str(i)
-        time.sleep(1)
-a = TM.switches[2]
-
-
 
 class WiFiDeviceReader:
 
