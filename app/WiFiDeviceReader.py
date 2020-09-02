@@ -18,6 +18,8 @@ class WiFiDeviceReader:
 
 	gps_is_on = False
 
+	number_collected = 0
+
 	def __init__(self, wifi_serial_port, gps_serial_port, database_location):
 		# set display
 		self.tm_board = TMBoards(19, 13, 6, 1)
@@ -65,6 +67,9 @@ class WiFiDeviceReader:
 		# check gps connection
 		if '*' in gps_data.get('latitude'):
 			return
+
+		# if this is the first call, record the time.
+
 
 		# set data
 		self.gps_data = gps_data
@@ -131,7 +136,10 @@ class WiFiDeviceReader:
 			return
 		else:
 			self.redis_cache.set_key(key_name, 1, 600)
+
 		self.sqlite_processor.insert_into_sqlite(cleaned_data)
+		self.number_collected += 1
+		self.tm_board.segments[4] = str(self.number_collected)
 		self.tm_board.leds[0] = True
 
 	def process_serial_input(self):
@@ -163,3 +171,7 @@ class WiFiDeviceReader:
 				error_log.write(str(e))
 		finally:
 			self.sqlite_processor.close_connection()
+
+
+if __name__ == '__main__':
+    pass
