@@ -104,12 +104,6 @@ class WiFiDeviceReader:
 		if wifi_data is None:
 			return
 
-		# check cache
-		if self.redis_cache.is_key_in_store(wifi_data.get('mac_address')):
-			return
-		else:
-			self.redis_cache.set_key(wifi_data.get('mac_address'), 1, 30)
-
 		# set WiFi data
 		self.wifi_data = wifi_data
 
