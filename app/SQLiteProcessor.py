@@ -1,6 +1,4 @@
 import sqlite3
-import json
-import datetime
 
 
 class SQLiteProcessor:
@@ -27,8 +25,23 @@ class SQLiteProcessor:
 			)
 			""" % message_dictionary
 		)
+		print(message_dictionary)
 		cursor.close()
 		self.database_connection.commit()
 
 	def close_connection(self):
 		self.database_connection.close()
+
+	def get_data(self):
+		cursor = self.database_connection.cursor()
+		cursor.execute("SELECT * FROM mac_data")
+		x = cursor.fetchall()
+		cursor.close()
+		print(x)
+
+		pass
+
+
+if __name__ == '__main__':
+	SQLiteProcessor('/Users/davidhaverberg/PycharmProjects/ThereAndMacAgain/data.db').get_data()
+	pass
