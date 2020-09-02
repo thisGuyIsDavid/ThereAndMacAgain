@@ -19,11 +19,11 @@ class SQLiteProcessor:
 		cursor.execute(
 			"""
 			INSERT INTO mac_data (
-				message, latitude, longitude, timestamp
+				mac_address, latitude, longitude, timestamp
 			) VALUES (
-				'%(mac_address)s', '%(latitude)s', '%(longitude)s', '%(timestamp)s'
+				'%s', '%s', '%s', '%s'
 			)
-			""" % message_dictionary
+			""" % (message_dictionary.get('mac_address'), message_dictionary.get('latitude'), message_dictionary.get('longitude'), message_dictionary.get('timestamp'))
 		)
 		print(message_dictionary)
 		cursor.close()

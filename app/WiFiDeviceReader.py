@@ -122,7 +122,7 @@ class WiFiDeviceReader:
 	def process_collected_data(self):
 		collected_data = {**self.gps_data, **self.wifi_data}
 		cleaned_data = {key: value if value != '' else None for key, value in collected_data.items()}
-		print(cleaned_data)
+		#	print(cleaned_data)
 		self.sqlite_processor.insert_into_sqlite(cleaned_data)
 
 	def process_serial_input(self):
