@@ -19,15 +19,15 @@ class WiFiDeviceReader:
 	gps_is_on = False
 
 	def __init__(self, wifi_serial_port, gps_serial_port, database_location):
+		# set display
+		self.tm_board = TMBoards(19, 13, 6, 1)
+
 		# set serial
 		self.set_wifi_serial(wifi_serial_port)
 		self.set_gps_serial(gps_serial_port)
 
 		# set cache
 		self.redis_cache = RedisCache()
-
-		# set display
-		self.tm_board = TMBoards(19, 13, 6, 1)
 
 		# set SQLite processor
 		self.sqlite_processor = SQLiteProcessor(database_location=database_location, run_setup=True)
