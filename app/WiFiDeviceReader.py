@@ -69,7 +69,7 @@ class WiFiDeviceReader:
 		return {
 			"latitude": gps_array[0],
 			"longitude": gps_array[1],
-			"date": gps_array[2]
+			"timestamp": gps_array[2]
 		}
 
 	# WiFi data
