@@ -138,6 +138,7 @@ class WiFiDeviceReader:
 
 				self.process_collected_data()
 			except Exception as e:
+				print(e)
 				continue
 
 	def run(self):
