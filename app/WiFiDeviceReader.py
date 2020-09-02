@@ -126,7 +126,7 @@ class WiFiDeviceReader:
 		cleaned_data = {key: value if value != '' else None for key, value in collected_data.items()}
 		key_name = "%s_%s_%s" % (cleaned_data.get('mac_address'), cleaned_data.get('latitude'), cleaned_data.get('longitude'))
 		print(key_name)
-		self.sqlite_processor.insert_into_sqlite(cleaned_data)
+		#	self.sqlite_processor.insert_into_sqlite(cleaned_data)
 
 	def process_serial_input(self):
 		while True:
@@ -148,7 +148,10 @@ class WiFiDeviceReader:
 			self.process_serial_input()
 		except KeyboardInterrupt as ki:
 			pass
-
+		except Exception as e:
+			print(e)
+			with open('errorlog.txt', 'w') as error_log:
+				error_log.write(str(e))
 		finally:
 			self.sqlite_processor.close_connection()
 
