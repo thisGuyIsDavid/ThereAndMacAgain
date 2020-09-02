@@ -67,6 +67,9 @@ class WiFiDeviceReader:
 	@staticmethod
 	def process_gps_data(gps_data):
 		gps_array = [x for x in gps_data.strip().split('|') if x != '']
+		latitude = round(float(gps_array[0]), 4)
+		longitude = round(float(gps_array[1]), 4)
+		print(latitude, longitude)
 		return {
 			"latitude": gps_array[0],
 			"longitude": gps_array[1],
@@ -122,7 +125,6 @@ class WiFiDeviceReader:
 	def process_collected_data(self):
 		collected_data = {**self.gps_data, **self.wifi_data}
 		cleaned_data = {key: value if value != '' else None for key, value in collected_data.items()}
-		#	print(cleaned_data)
 		self.sqlite_processor.insert_into_sqlite(cleaned_data)
 
 	def process_serial_input(self):
