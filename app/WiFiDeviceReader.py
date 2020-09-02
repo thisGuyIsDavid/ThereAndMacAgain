@@ -5,6 +5,7 @@ import serial
 from app.SQLiteProcessor import SQLiteProcessor
 from app.RedisCache import RedisCache
 
+
 class WiFiDeviceReader:
 
 	gps_serial_reader = None
@@ -123,7 +124,7 @@ class WiFiDeviceReader:
 		cleaned_data = {key: value if value != '' else None for key, value in collected_data.items()}
 		self.redis_cache.enqueue_job(process_reading, (cleaned_data,), 500)
 		#process_reading(collected_data)
-		#	self.sqlite_processor.insert_into_sqlite(cleaned_data)
+		self.sqlite_processor.insert_into_sqlite(cleaned_data)
 
 	def process_serial_input(self):
 		while True:
