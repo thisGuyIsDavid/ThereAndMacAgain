@@ -9,16 +9,14 @@ import time
 
 class WiFiDeviceReader:
 
+	number_collected = 0
+	when_started = time.time()
+
 	gps_serial_reader = None
 	gps_data = None
-	gps_data_age = None
 
 	wifi_serial_reader = None
 	wifi_data = None
-
-	gps_is_on = False
-
-	number_collected = 0
 
 	def __init__(self, wifi_serial_port, gps_serial_port, database_location):
 		# set display
@@ -169,9 +167,19 @@ class WiFiDeviceReader:
 	def display_count(self):
 		number_collected_string = str(self.number_collected)
 		if len(number_collected_string) > 4:
-			self.tm_board.segments[4] = '9999'
+			self.tm_board.segments[0] = '9999'
 		else:
-			self.tm_board.segments[4] = "%s%s" % ("0" * (4 - len(str(self.number_collected))), self.number_collected)
+			self.tm_board.segments[0] = "%s%s" % ("0" * (4 - len(str(self.number_collected))), self.number_collected)
+
+		seconds_since_start = round(time.time() - self.when_started)
+		average = self.number_collected / seconds_since_start
+		if average < 1:
+			average = round(average, 3)
+		else:
+			average = round(average, 1)
+
+
+		print(str(average))
 
 	def run(self):
 		try:
