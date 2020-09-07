@@ -48,4 +48,4 @@ class SQLiteProcessor:
 		]
 
 if __name__ == '__main__':
-    print(len(SQLiteProcessor('/Users/davidhaverberg/PycharmProjects/ThereAndMacAgain/data.db').get_data()))
+    print((SQLiteProcessor('/Users/davidhaverberg/PycharmProjects/ThereAndMacAgain/data.db').get_data()))

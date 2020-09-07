@@ -119,7 +119,7 @@ class WiFiDeviceReader:
 		wifi_array = wifi_data.strip().replace("\n", "").split('|')
 		return {
 			"mac_address": wifi_array[0],
-			"name": wifi_array[1] if wifi_array[1] != '' else None
+			"name": wifi_array[1]
 		}
 
 	# All data
