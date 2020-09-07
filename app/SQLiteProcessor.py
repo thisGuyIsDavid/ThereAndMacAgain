@@ -11,7 +11,7 @@ class SQLiteProcessor:
 		cursor = self.database_connection.cursor()
 		cursor.execute("SELECT name FROM sqlite_master WHERE type='table' AND name='mac_data';")
 		if len(cursor.fetchall()) == 0:
-			cursor.execute("CREATE TABLE mac_data(id INTEGER PRIMARY KEY AUTOINCREMENT, mac_address TEXT, latitude TEXT, longitude TEXT, timestamp TEXT);")
+			cursor.execute("CREATE TABLE mac_data(id INTEGER PRIMARY KEY AUTOINCREMENT, mac_address TEXT, name TEXT, latitude TEXT, longitude TEXT, timestamp TEXT);")
 		self.database_connection.commit()
 
 	def insert_into_sqlite(self, message_dictionary):
@@ -19,11 +19,11 @@ class SQLiteProcessor:
 		cursor.execute(
 			"""
 			INSERT INTO mac_data (
-				mac_address, latitude, longitude, timestamp
+				mac_address, name, latitude, longitude, timestamp
 			) VALUES (
-				'%s', '%s', '%s', '%s'
+				'%s', '%s', '%s', '%s', '%s'
 			)
-			""" % (message_dictionary.get('mac_address'), message_dictionary.get('latitude'), message_dictionary.get('longitude'), message_dictionary.get('timestamp'))
+			""" % (message_dictionary.get('mac_address'), message_dictionary.get('name'), message_dictionary.get('latitude'), message_dictionary.get('longitude'), message_dictionary.get('timestamp'))
 		)
 		cursor.close()
 		self.database_connection.commit()
@@ -33,7 +33,7 @@ class SQLiteProcessor:
 
 	def get_data(self):
 		cursor = self.database_connection.cursor()
-		cursor.execute("SELECT mac_address, latitude, longitude, timestamp FROM mac_data")
+		cursor.execute("SELECT mac_address, name, latitude, longitude, timestamp FROM mac_data")
 		results = cursor.fetchall()
 		cursor.close()
 
