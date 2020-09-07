@@ -70,7 +70,6 @@ class WiFiDeviceReader:
 		gps_array = [x for x in gps_data.strip().split('|') if x != '']
 		latitude = round(float(gps_array[0]), 4)
 		longitude = round(float(gps_array[1]), 4)
-		print(gps_array)
 
 		return {
 			"latitude": str(latitude),
@@ -134,6 +133,7 @@ class WiFiDeviceReader:
 			return
 		else:
 			self.redis_cache.set_key(key_name, 1, 600)
+		print(cleaned_data)
 
 		self.sqlite_processor.insert_into_sqlite(cleaned_data)
 		self.number_collected += 1
