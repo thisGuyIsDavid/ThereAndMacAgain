@@ -36,11 +36,15 @@ class SQLiteProcessor:
 		cursor.execute("SELECT mac_address, latitude, longitude, timestamp FROM mac_data")
 		results = cursor.fetchall()
 		cursor.close()
+
 		return [
 			{
-				"mac_address": result[0],
+				"mac_address": result[0].replace(":", "").upper(),
 				"latitude": result[1],
 				"longitude": result[2],
-				"timestamp": result[3]
+				"when_recorded": result[3]
 			} for result in results
 		]
+
+if __name__ == '__main__':
+    print(len(SQLiteProcessor('/Users/davidhaverberg/PycharmProjects/ThereAndMacAgain/data.db').get_data()))

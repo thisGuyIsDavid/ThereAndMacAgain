@@ -1,10 +1,10 @@
 # !/usr/bin/env python
-from app.displays.TMBoards import TMBoards
+import time
+
 import serial
 
-from app.SQLiteProcessor import SQLiteProcessor
 from app.RedisCache import RedisCache
-import time
+from app.SQLiteProcessor import SQLiteProcessor
 
 
 class WiFiDeviceReader:
@@ -19,9 +19,6 @@ class WiFiDeviceReader:
 	wifi_data = None
 
 	def __init__(self, wifi_serial_port, gps_serial_port, database_location):
-		# set display
-		self.tm_board = TMBoards(19, 13, 6, 1)
-
 		# set serial
 		self.set_wifi_serial(wifi_serial_port)
 		self.set_gps_serial(gps_serial_port)
@@ -92,7 +89,6 @@ class WiFiDeviceReader:
 			bytesize=serial.EIGHTBITS,
 			timeout=1
 		)
-		self.tm_board.leds[2] = True
 
 	def set_wifi_data(self):
 		# clear WiFi variable
@@ -108,6 +104,12 @@ class WiFiDeviceReader:
 		wifi_data = self.process_wifi_data(wifi_message)
 		if wifi_data is None:
 			return
+
+		# check cache. This is for when the device is in motion.
+		if self.redis_cache.is_key_in_store(wifi_data):
+			return
+		else:
+			self.redis_cache.set_key(wifi_data, 1, 60)
 
 		# set WiFi data
 		self.wifi_data = wifi_data
@@ -125,52 +127,31 @@ class WiFiDeviceReader:
 		cleaned_data = {key: value if value != '' else None for key, value in collected_data.items()}
 		key_name = "%s_%s_%s" % (cleaned_data.get('mac_address'), cleaned_data.get('latitude'), cleaned_data.get('longitude'))
 
-		# check cache
+		# check cache. This is for when the device is not in motion.
 		if self.redis_cache.is_key_in_store(key_name):
 			return
 		else:
 			self.redis_cache.set_key(key_name, 1, 600)
 
-		self.tm_board.leds[3] = True
 		self.sqlite_processor.insert_into_sqlite(cleaned_data)
 		self.number_collected += 1
 
 	def process_serial_input(self):
 		while True:
-			# GPS
-			self.tm_board.leds[1] = False
-
-			# Wifi
-			self.tm_board.leds[2] = False
-
-			# General
-			self.tm_board.leds[3] = False
-
 			try:
 				self.set_gps_data()
 				if self.gps_data is None:
 					continue
-				self.tm_board.leds[1] = True
 
 				self.set_wifi_data()
 				if self.wifi_data is None:
 					continue
-				self.tm_board.leds[2] = True
 
 				self.process_collected_data()
 
-				self.display_count()
 			except Exception as e:
 				print(e)
 				continue
-
-	def display_count(self):
-		number_collected_string = str(self.number_collected)
-		if len(number_collected_string) > 8:
-			self.tm_board.segments[0] = '9999'
-		else:
-			self.tm_board.segments[0] = "%s%s" % ("0" * (8 - len(str(self.number_collected))), self.number_collected)
-
 
 	def run(self):
 		try:
