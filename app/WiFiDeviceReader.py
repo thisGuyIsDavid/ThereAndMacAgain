@@ -117,6 +117,7 @@ class WiFiDeviceReader:
 	@staticmethod
 	def process_wifi_data(wifi_data):
 		wifi_array = wifi_data.strip().replace("\n", "").split('|')
+		print(wifi_array)
 		return {
 			"mac_address": wifi_array[0]
 		}
