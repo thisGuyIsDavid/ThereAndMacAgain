@@ -40,9 +40,10 @@ class SQLiteProcessor:
 		return [
 			{
 				"mac_address": result[0].replace(":", "").upper(),
-				"latitude": result[1],
-				"longitude": result[2],
-				"when_recorded": result[3]
+				"name": result[1],
+				"latitude": result[2],
+				"longitude": result[3],
+				"when_recorded": result[4]
 			} for result in results
 		]
 
