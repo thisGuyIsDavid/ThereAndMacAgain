@@ -100,7 +100,6 @@ class WiFiDeviceReader:
 		wifi_message = wifi_message.decode('utf-8').strip()
 		if wifi_message == "":
 			return
-		print(wifi_message)
 		# convert to dictionary
 		wifi_data = self.process_wifi_data(wifi_message)
 		if wifi_data is None:
