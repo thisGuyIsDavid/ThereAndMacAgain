@@ -68,9 +68,10 @@ class WiFiDeviceReader:
 	@staticmethod
 	def process_gps_data(gps_data):
 		gps_array = [x for x in gps_data.strip().split('|') if x != '']
-		print(gps_array)
 		latitude = round(float(gps_array[0]), 4)
 		longitude = round(float(gps_array[1]), 4)
+		print(gps_array)
+
 		return {
 			"latitude": str(latitude),
 			"longitude": str(longitude),
