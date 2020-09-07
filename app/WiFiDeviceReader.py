@@ -100,17 +100,17 @@ class WiFiDeviceReader:
 		wifi_message = wifi_message.decode('utf-8').strip()
 		if wifi_message == "":
 			return
-
+		print(wifi_message)
 		# convert to dictionary
 		wifi_data = self.process_wifi_data(wifi_message)
 		if wifi_data is None:
 			return
 
 		# check cache. This is for when the device is in motion.
-		if self.redis_cache.is_key_in_store(wifi_data):
+		if self.redis_cache.is_key_in_store(wifi_data.get('mac_address')):
 			return
 		else:
-			self.redis_cache.set_key(wifi_data, 1, 60)
+			self.redis_cache.set_key(wifi_data.get('mac_address'), 1, 60)
 
 		# set WiFi data
 		self.wifi_data = wifi_data
@@ -133,7 +133,6 @@ class WiFiDeviceReader:
 			return
 		else:
 			self.redis_cache.set_key(key_name, 1, 600)
-		print(cleaned_data)
 
 		self.sqlite_processor.insert_into_sqlite(cleaned_data)
 		self.number_collected += 1
