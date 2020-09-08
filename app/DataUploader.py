@@ -26,14 +26,22 @@ class DataUploader:
 
     def insert_individuals(self):
         known_mac_addresses = [x[0] for x in LocalDatabaseService().get_all_rows("""SELECT DISTINCT id FROM mac_individuals""")]
-        collected_mac_addresses = list(set([x.get('mac_address') for x in self.data_to_upload]))
-        new_mac_addresses = [x for x in collected_mac_addresses if x not in known_mac_addresses]
-        print("Found %s new mac addresses" % len(new_mac_addresses))
+
+        to_insert = []
+        for collected_mac_address in self.data_to_upload:
+            if collected_mac_address.get('mac_address') in known_mac_addresses:
+                continue
+            if len(list(filter(lambda x: x.get('mac_address') == collected_mac_address.get('mac_address'), to_insert))) > 0:
+                continue
+
+            to_insert.append(collected_mac_address)
+
+        print("Found %s new mac addresses" % len(to_insert))
         LocalDatabaseService().insert_many(
             """
-            INSERT IGNORE INTO mac_individuals (id) VALUES (%(id)s)
+            INSERT IGNORE INTO mac_individuals (id, name) VALUES (%(id)s, %(name)s)
             """,
-            [{'id': x} for x in new_mac_addresses]
+            [{'id': x.get('mac_address'), 'name': x.get('name')} for x in to_insert]
         )
 
     def insert_collected_data(self):

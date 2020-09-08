@@ -40,7 +40,7 @@ class SQLiteProcessor:
 		return [
 			{
 				"mac_address": result[0].replace(":", "").upper(),
-				"name": result[1],
+				"name": result[1] if result[1] != '' else None,
 				"latitude": result[2],
 				"longitude": result[3],
 				"when_recorded": result[4]

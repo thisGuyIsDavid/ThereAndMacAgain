@@ -113,6 +113,7 @@ class WiFiDeviceReader:
 
 		# set WiFi data
 		self.wifi_data = wifi_data
+		print(self.wifi_data)
 
 	@staticmethod
 	def process_wifi_data(wifi_data):
