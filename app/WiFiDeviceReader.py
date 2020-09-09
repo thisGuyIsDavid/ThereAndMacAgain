@@ -134,7 +134,7 @@ class WiFiDeviceReader:
 			return
 		else:
 			self.redis_cache.set_key(key_name, 1, 600)
-
+		print(cleaned_data)
 		self.sqlite_processor.insert_into_sqlite(cleaned_data)
 		self.number_collected += 1
 
