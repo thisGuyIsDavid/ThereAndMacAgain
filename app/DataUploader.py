@@ -2,6 +2,7 @@ from app.LocalDatabaseService import LocalDatabaseService
 from app.SQLiteProcessor import SQLiteProcessor
 import datetime
 
+
 class DataUploader:
     data_to_upload = []
     last_collection_date = None
@@ -10,9 +11,14 @@ class DataUploader:
         results = SQLiteProcessor('/Users/davidhaverberg/PycharmProjects/ThereAndMacAgain/data.db').get_data()
         if results is None:
             return
+        to_insert = []
         for result in results:
-            result['when_recorded'] = datetime.datetime.strptime(result['when_recorded'][:-3], '%m/%d/%Y %H:%M:%S')
-        self.data_to_upload = results
+            try:
+                result['when_recorded'] = datetime.datetime.strptime(result['when_recorded'][:-3], '%m/%d/%Y %H:%M:%S')
+                to_insert.append(result)
+            except ValueError:
+                continue
+        self.data_to_upload = to_insert
 
     def set_last_collection_date(self):
         result = LocalDatabaseService().get_row("""SELECT MAX(when_recorded) FROM mac_location_data LIMIT 1""")
