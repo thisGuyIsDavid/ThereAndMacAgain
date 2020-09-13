@@ -133,7 +133,6 @@ class WiFiDeviceReader:
 			return
 		else:
 			self.redis_cache.set_key(key_name, 1, 600)
-		print(cleaned_data)
 		self.sqlite_processor.insert_into_sqlite(cleaned_data)
 		self.number_collected += 1
 
@@ -151,7 +150,6 @@ class WiFiDeviceReader:
 				self.process_collected_data()
 
 			except Exception as e:
-				print(e)
 				continue
 
 	def run(self):
@@ -160,7 +158,6 @@ class WiFiDeviceReader:
 		except KeyboardInterrupt as ki:
 			pass
 		except Exception as e:
-			print(e)
 			with open('errorlog.txt', 'w') as error_log:
 				error_log.write(str(e))
 		finally:
