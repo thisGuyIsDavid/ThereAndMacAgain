@@ -3,7 +3,6 @@ import time
 
 import serial
 
-# set cache
 from app.RedisCache import RedisCache
 from app.SQLiteProcessor import SQLiteProcessor
 
