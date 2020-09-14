@@ -132,7 +132,7 @@ class WiFiDeviceReader:
 		if self.redis_cache.is_key_in_store(key_name):
 			return
 		else:
-			self.redis_cache.set_key(key_name, 1, 600)
+			self.redis_cache.set_key(key_name, 1, 3600)
 		self.sqlite_processor.insert_into_sqlite(cleaned_data)
 		self.number_collected += 1
 
