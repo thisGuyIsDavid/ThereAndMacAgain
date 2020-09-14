@@ -4,7 +4,7 @@ import time
 import serial
 
 # set cache
-from app.DeviceCache import DeviceCache
+from app.RedisCache import RedisCache
 from app.SQLiteProcessor import SQLiteProcessor
 
 
@@ -25,7 +25,7 @@ class WiFiDeviceReader:
 		self.set_gps_serial(gps_serial_port)
 
 		# set cache
-		self.cache = DeviceCache()
+		self.redis_cache = RedisCache()
 
 		# set SQLite processor
 		self.sqlite_processor = SQLiteProcessor(database_location=database_location, run_setup=True)
@@ -107,8 +107,10 @@ class WiFiDeviceReader:
 			return
 
 		# check cache. This is for when the device is in motion.
-		if self.cache.is_in_cache(wifi_data.get('mac_address')):
+		if self.redis_cache.is_key_in_store(wifi_data.get('mac_address')):
 			return
+		else:
+			self.redis_cache.set_key(wifi_data.get('mac_address'), 1, 180)
 
 		# set WiFi data
 		self.wifi_data = wifi_data
@@ -125,7 +127,13 @@ class WiFiDeviceReader:
 	def process_collected_data(self):
 		collected_data = {**self.gps_data, **self.wifi_data}
 		cleaned_data = {key: value if value != '' else None for key, value in collected_data.items()}
+		key_name = "%s_%s_%s" % (cleaned_data.get('mac_address'), cleaned_data.get('latitude'), cleaned_data.get('longitude'))
 
+		# check cache. This is for when the device is not in motion.
+		if self.redis_cache.is_key_in_store(key_name):
+			return
+		else:
+			self.redis_cache.set_key(key_name, 1, 3600)
 		self.sqlite_processor.insert_into_sqlite(cleaned_data)
 		self.number_collected += 1
 
