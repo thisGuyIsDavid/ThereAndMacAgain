@@ -150,6 +150,8 @@ class WiFiDeviceReader:
 				self.process_collected_data()
 
 			except Exception as e:
+				with open('errorlog.txt', 'a') as error_log:
+					error_log.write(str(e))
 				continue
 
 	def run(self):
@@ -158,7 +160,7 @@ class WiFiDeviceReader:
 		except KeyboardInterrupt as ki:
 			pass
 		except Exception as e:
-			with open('errorlog.txt', 'w') as error_log:
+			with open('errorlog.txt', 'a') as error_log:
 				error_log.write(str(e))
 		finally:
 			self.sqlite_processor.close_connection()
