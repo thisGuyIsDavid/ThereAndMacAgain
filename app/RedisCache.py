@@ -2,10 +2,20 @@ import os
 
 import redis
 from rq import Queue
-
+import time
 
 class RedisCache:
     q = None
+
+    def __init__(self):
+        ping = False
+        while not ping:
+            try:
+                ping = self.get_connection().ping()
+                print(ping)
+            except:
+                pass
+            time.sleep(1)
 
     def get_connection(self):
         return redis.from_url(os.getenv('REDIS_URL', 'redis://localhost:6379'))
@@ -37,4 +47,5 @@ class RedisCache:
 
 
 if __name__ == '__main__':
-    pass
+    x = RedisCache().get_connection()
+    print(x)
