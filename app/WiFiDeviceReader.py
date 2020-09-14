@@ -151,13 +151,11 @@ class WiFiDeviceReader:
 
 			except Exception as e:
 				with open('errorlog.txt', 'a') as error_log:
-					error_log.write(str(e))
+					error_log.write(str(e) + '\n')
 				continue
 
 	def run(self):
 		try:
-			with open('started_up.txt', 'w') as started_up:
-				started_up.write("IT STARTED")
 			self.process_serial_input()
 		except KeyboardInterrupt as ki:
 			pass
