@@ -156,6 +156,8 @@ class WiFiDeviceReader:
 
 	def run(self):
 		try:
+			with open('started_up.txt', 'w') as started_up:
+				started_up.write("IT STARTED")
 			self.process_serial_input()
 		except KeyboardInterrupt as ki:
 			pass
