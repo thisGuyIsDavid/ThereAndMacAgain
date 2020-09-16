@@ -11,6 +11,7 @@ class WiFiDeviceReader:
 	PROGRAM_LIGHT_POS = 0
 	GPS_LIGHT_POS = 1
 	WIFI_LIGHT_POS = 2
+	PROCESS_LIGHT_POS = 3
 
 	number_collected = 0
 	when_started = time.time()
@@ -151,14 +152,16 @@ class WiFiDeviceReader:
 			return
 		else:
 			self.redis_cache.set_key(key_name, 1, 3600)
+
+		self.set_light(self.PROCESS_LIGHT_POS, Color(0, 255, 0))
 		self.sqlite_processor.insert_into_sqlite(cleaned_data)
 		self.number_collected += 1
+		self.set_light(self.PROCESS_LIGHT_POS, Color(0, 0, 0))
 
 	def process_serial_input(self):
 		while True:
 			try:
 				self.set_light(self.PROGRAM_LIGHT_POS, Color(0, 255, 0))
-
 				self.set_gps_data()
 				if self.gps_data is None:
 					self.set_light(self.GPS_LIGHT_POS, Color(255, 0, 0))
