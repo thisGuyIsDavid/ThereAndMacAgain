@@ -39,7 +39,7 @@ class WiFiDeviceReader:
 		self.status_light.begin()
 
 		for pin in [self.PROGRAM_LIGHT_POS, self.GPS_LIGHT_POS, self.WIFI_LIGHT_POS]:
-			self.set_light(pin,  Color(255, 0, 0))
+			self.set_light(pin,  Color(0, 0, 0))
 
 
 	def set_light(self, pin, color):
@@ -161,13 +161,13 @@ class WiFiDeviceReader:
 
 				self.set_gps_data()
 				if self.gps_data is None:
-					self.set_light(self.GPS_LIGHT_POS, Color(0, 255, 255))
+					self.set_light(self.GPS_LIGHT_POS, Color(255, 0, 0))
 					continue
 				self.set_light(self.GPS_LIGHT_POS, Color(0, 255, 0))
 
 				self.set_wifi_data()
 				if self.wifi_data is None:
-					self.set_light(self.WIFI_LIGHT_POS, Color(0, 0, 255))
+					self.set_light(self.WIFI_LIGHT_POS, Color(255, 0, 0))
 					continue
 				self.set_light(self.WIFI_LIGHT_POS, Color(0, 255, 0))
 
