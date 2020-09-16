@@ -35,7 +35,7 @@ class WiFiDeviceReader:
 		self.sqlite_processor = SQLiteProcessor(database_location=database_location, run_setup=True)
 
 		# set status lights
-		self.status_light = PixelStrip(8, 18, 800000, 10, False, 255, 0)
+		self.status_light = PixelStrip(8, 18, 800000, 10, False, 100, 0)
 		self.status_light.begin()
 
 		for pin in [self.PROGRAM_LIGHT_POS, self.GPS_LIGHT_POS, self.WIFI_LIGHT_POS]:
@@ -161,13 +161,13 @@ class WiFiDeviceReader:
 
 				self.set_gps_data()
 				if self.gps_data is None:
-					self.set_light(self.GPS_LIGHT_POS, Color(255, 255, 0))
+					self.set_light(self.GPS_LIGHT_POS, Color(0, 255, 255))
 					continue
 				self.set_light(self.GPS_LIGHT_POS, Color(0, 255, 0))
 
 				self.set_wifi_data()
 				if self.wifi_data is None:
-					self.set_light(self.WIFI_LIGHT_POS, Color(255, 255, 0))
+					self.set_light(self.WIFI_LIGHT_POS, Color(0, 0, 255))
 					continue
 				self.set_light(self.WIFI_LIGHT_POS, Color(0, 255, 0))
 
