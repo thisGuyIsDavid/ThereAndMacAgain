@@ -37,9 +37,15 @@ class WiFiDeviceReader:
 
 		# set status lights
 		self.status_light = PixelStrip(8, 18, 800000, 10, False, 255, 0)
+		self.status_light.begin()
 
 		for pin in [self.PROGRAM_LIGHT_POS, self.GPS_LIGHT_POS, self.WIFI_LIGHT_POS]:
-			self.status_light.setPixelColor(pin, Color(255, 0, 0))
+			self.set_light(pin,  Color(255, 0, 0))
+
+
+	def set_light(self, pin, color):
+		self.status_light.setPixelColor(pin, color)
+		self.status_light.show()
 
 	# GPS data
 	def set_gps_serial(self, gps_serial_port):
@@ -103,6 +109,7 @@ class WiFiDeviceReader:
 			timeout=1
 		)
 
+
 	def set_wifi_data(self):
 		# clear WiFi variable
 		self.wifi_data = None
@@ -151,19 +158,27 @@ class WiFiDeviceReader:
 	def process_serial_input(self):
 		while True:
 			try:
+				self.set_light(self.PROGRAM_LIGHT_POS, Color(0, 255, 0))
+
 				self.set_gps_data()
 				if self.gps_data is None:
+					self.set_light(self.GPS_LIGHT_POS, Color(255, 0, 0))
 					continue
+				self.set_light(self.GPS_LIGHT_POS, Color(0, 255, 0))
 
 				self.set_wifi_data()
 				if self.wifi_data is None:
+					self.set_light(self.WIFI_LIGHT_POS, Color(255, 0, 0))
 					continue
+				self.set_light(self.WIFI_LIGHT_POS, Color(0, 255, 0))
 
 				self.process_collected_data()
 
 			except Exception as e:
 				with open('errorlog.txt', 'a') as error_log:
 					error_log.write(str(e) + '\n')
+					self.set_light(self.PROGRAM_LIGHT_POS, Color(0, 0, 255))
+
 				continue
 
 	def run(self):
@@ -175,5 +190,6 @@ class WiFiDeviceReader:
 			with open('errorlog.txt', 'a') as error_log:
 				error_log.write(str(e))
 		finally:
+			self.set_light(self.PROGRAM_LIGHT_POS, Color(255, 0, 0))
 			self.sqlite_processor.close_connection()
 
