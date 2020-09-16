@@ -91,7 +91,7 @@ class ClusterSetter:
 				"name": "UNKNOWN LOCATION",
 				"latitude": result[0],
 				"longitude": result[1]
-			} for result in results if result[2] >= 75
+			} for result in results if result[2] >= 50
 		]
 
 	def insert_unknown_cluster_points(self):

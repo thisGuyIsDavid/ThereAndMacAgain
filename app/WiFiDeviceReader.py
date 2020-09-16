@@ -1,13 +1,16 @@
 # !/usr/bin/env python
 import time
-
 import serial
 
 from app.RedisCache import RedisCache
 from app.SQLiteProcessor import SQLiteProcessor
+from rpi_ws281x import PixelStrip, Color
 
 
 class WiFiDeviceReader:
+	PROGRAM_LIGHT_POS = 0
+	GPS_LIGHT_POS = 1
+	WIFI_LIGHT_POS = 2
 
 	number_collected = 0
 	when_started = time.time()
@@ -15,8 +18,11 @@ class WiFiDeviceReader:
 	gps_serial_reader = None
 	gps_data = None
 
+
 	wifi_serial_reader = None
 	wifi_data = None
+
+
 
 	def __init__(self, wifi_serial_port, gps_serial_port, database_location):
 		# set serial
@@ -28,6 +34,12 @@ class WiFiDeviceReader:
 
 		# set SQLite processor
 		self.sqlite_processor = SQLiteProcessor(database_location=database_location, run_setup=True)
+
+		# set status lights
+		self.status_light = PixelStrip(8, 18, 800000, 10, False, 255, 0)
+
+		for pin in [self.PROGRAM_LIGHT_POS, self.GPS_LIGHT_POS, self.WIFI_LIGHT_POS]:
+			self.status_light.setPixelColor(pin, Color(255, 0, 0))
 
 	# GPS data
 	def set_gps_serial(self, gps_serial_port):
