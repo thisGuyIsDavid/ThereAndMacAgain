@@ -18,7 +18,6 @@ class WiFiDeviceReader:
 	gps_serial_reader = None
 	gps_data = None
 
-
 	wifi_serial_reader = None
 	wifi_data = None
 
@@ -162,13 +161,13 @@ class WiFiDeviceReader:
 
 				self.set_gps_data()
 				if self.gps_data is None:
-					self.set_light(self.GPS_LIGHT_POS, Color(255, 0, 0))
+					self.set_light(self.GPS_LIGHT_POS, Color(255, 255, 0))
 					continue
 				self.set_light(self.GPS_LIGHT_POS, Color(0, 255, 0))
 
 				self.set_wifi_data()
 				if self.wifi_data is None:
-					self.set_light(self.WIFI_LIGHT_POS, Color(255, 0, 0))
+					self.set_light(self.WIFI_LIGHT_POS, Color(255, 255, 0))
 					continue
 				self.set_light(self.WIFI_LIGHT_POS, Color(0, 255, 0))
 
