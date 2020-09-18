@@ -23,14 +23,17 @@ class DateAnalysis:
                 FROM mac_location_data 
                 GROUP BY mac_address
             ) AS encountered_macs
+            
             JOIN mac_location_data AS first_seen
                 ON first_seen.mac_address = encountered_macs.mac_address AND first_seen.when_recorded = encountered_macs.first_seen
             LEFT JOIN mac_locations AS first_seen_location
                 ON first_seen_location.id = first_seen.location_id
+            
             JOIN mac_location_data AS last_seen
                 ON last_seen.mac_address = encountered_macs.mac_address AND last_seen.when_recorded = encountered_macs.last_seen
             LEFT JOIN mac_locations AS last_seen_location
                 ON last_seen_location.id = last_seen.location_id
+            
             JOIN mac_individuals
                 ON mac_individuals.id = encountered_macs.mac_address
             JOIN mac_vendors
@@ -57,10 +60,17 @@ class DateAnalysis:
                 'vendor': result[3],
                 'company_name': result[4],
                 'company_type': result[5],
-                'first_latitude': result[6],
-                'first_longitude': result[7],
-                'last_latitude': result[8],
-                'last_longitude': result[9],
+
+                'first_location_name': result[6],
+                'first_location_type': result[7],
+                'first_latitude': result[8],
+                'first_longitude': result[9],
+
+                'last_location_name': result[10],
+                'last_location_type': result[11],
+
+                'last_latitude': result[12],
+                'last_longitude': result[13],
             }
             for result in results
         ]
@@ -69,6 +79,7 @@ class DateAnalysis:
         for mac in self.mac_data:
             print(mac.get('mac_address'))
             print('First Sighting: ')
+            print(mac.get('first_latitude'), mac.get('first_longitude'), mac.get('last_latitude'), mac.get('last_longitude'))
             distance = haversine(mac.get('first_latitude'), mac.get('first_longitude'), mac.get('last_latitude'), mac.get('last_longitude'))
             print(round(distance, 2))
 

@@ -71,6 +71,10 @@ class WiFiDeviceReader:
 		if gps_message == "":
 			return
 
+		# check gps connection
+		if '*' in gps_message:
+			return
+
 		# convert to dictionary
 		gps_data = self.process_gps_data(gps_message)
 		if gps_data is None:
@@ -109,7 +113,6 @@ class WiFiDeviceReader:
 			timeout=1
 		)
 
-
 	def set_wifi_data(self):
 		# clear WiFi variable
 		self.wifi_data = None
@@ -128,7 +131,7 @@ class WiFiDeviceReader:
 		if self.redis_cache.is_key_in_store(wifi_data.get('mac_address')):
 			return
 		else:
-			self.redis_cache.set_key(wifi_data.get('mac_address'), 1, 180)
+			self.redis_cache.set_key(wifi_data.get('mac_address'), 1, 30)
 
 		# set WiFi data
 		self.wifi_data = wifi_data
