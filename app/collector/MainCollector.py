@@ -5,8 +5,12 @@ from app.collector.WIFICollector import WIFICollector
 class MainCollector:
 
     def __init__(self, gps_port, wifi_port, database_location):
+
         self.gps_collector = GPSCollector(gps_port)
+        self.gps_collector.set_collector()
+
         self.wifi_collector = WIFICollector(wifi_port)
+        self.wifi_collector.set_collector()
 
     def read_collectors(self):
         while True:
