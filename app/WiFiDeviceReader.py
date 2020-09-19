@@ -22,8 +22,6 @@ class WiFiDeviceReader:
 	wifi_serial_reader = None
 	wifi_data = None
 
-
-
 	def __init__(self, wifi_serial_port, gps_serial_port, database_location):
 		# set serial
 		self.set_wifi_serial(wifi_serial_port)
@@ -158,6 +156,9 @@ class WiFiDeviceReader:
 
 		self.set_light(self.PROCESS_LIGHT_POS, Color(0, 255, 0))
 		self.sqlite_processor.insert_into_sqlite(cleaned_data)
+
+		wifi_device_code = self.wifi_data.get('mac_address')[:6]
+
 		self.number_collected += 1
 		self.set_light(self.PROCESS_LIGHT_POS, Color(0, 0, 0))
 

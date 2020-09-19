@@ -1,9 +1,8 @@
-from app.WiFiDeviceReader import WiFiDeviceReader
+from app.collector.MainCollector import MainCollector
 
 if __name__ == '__main__':
-    WiFiDeviceReader(
-        wifi_serial_port='/dev/ttyUSB0',
-        gps_serial_port='/dev/ttyUSB1',
-        database_location='data.db'
-
+    MainCollector(
+        wifi_port='/dev/ttyUSB0',
+        gps_port='/dev/ttyUSB1',
+        database_location=''
     ).run()
