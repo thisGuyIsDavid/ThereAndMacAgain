@@ -28,7 +28,7 @@ class MainCollector:
 
     def run(self):
         try:
-            pass
+            self.read_collectors()
         except KeyboardInterrupt as ki:
             pass
         except Exception as e:
