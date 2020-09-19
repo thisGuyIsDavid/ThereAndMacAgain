@@ -1,5 +1,6 @@
 from app.collector.GPSCollector import GPSCollector
 from app.collector.WIFICollector import WIFICollector
+from app.RedisCache import RedisCache
 
 
 class MainCollector:
@@ -11,6 +12,24 @@ class MainCollector:
 
         self.wifi_collector = WIFICollector(wifi_port)
         self.wifi_collector.set_collector()
+
+        self.redis_cache = RedisCache()
+
+    def is_in_mac_address_cache(self, mac_address):
+        # check cache. This is for when the device is in motion.
+        if self.redis_cache.is_key_in_store(mac_address):
+            return True
+        else:
+            self.redis_cache.set_key(mac_address, 1, 30)
+            return False
+
+    def process_collected_data(self, collected_data):
+
+        if self.is_in_mac_address_cache(collected_data.get('mac_address')):
+            return
+
+        print(collected_data)
+
 
     def read_collectors(self):
         while True:
@@ -25,11 +44,13 @@ class MainCollector:
 
                 collected_data = {**gps_data, **wifi_data}
 
-                print(collected_data)
+                self.process_collected_data(collected_data)
 
             except Exception as e:
                 print(e)
                 continue
+
+
 
 
     def run(self):
