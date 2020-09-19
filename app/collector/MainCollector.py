@@ -23,7 +23,9 @@ class MainCollector:
                 if wifi_data is None:
                     continue
 
-                print(gps_data, wifi_data)
+                collected_data = {**gps_data, **wifi_data}
+
+                print(collected_data)
 
             except Exception as e:
                 print(e)
