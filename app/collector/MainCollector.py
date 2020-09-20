@@ -47,7 +47,7 @@ class MainCollector:
             return
 
 
-        print(collected_data.get('vendor'))
+        print(collected_data.get('vendor'), collected_data.get('mac_address')[-8:])
 
     def read_collectors(self):
         while True:
