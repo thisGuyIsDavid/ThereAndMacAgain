@@ -28,7 +28,6 @@ class MainCollector:
             return False
 
     def is_mac_and_location_in_cache(self, mac_address, latitude, longitude):
-        return False
         key_name = "%s_%s_%s" % (mac_address, latitude, longitude)
         if self.redis_cache.is_key_in_store(key_name):
             return True
