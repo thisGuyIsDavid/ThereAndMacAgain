@@ -15,9 +15,9 @@ class WIFICollector(SerialCollector):
 
     def setup(self):
         self.set_collector()
-        with open('./vendors.txt', encoding='utf-8') as vendor_list:
+        with open('/home/pi/vendors.txt', encoding='utf-8') as vendor_list:
             for line in vendor_list:
                 line = line.strip().split('\t')
-                vendor_list[line[0]] = line[1]
+                self.vendor_map[line[0]] = line[1]
 
 
