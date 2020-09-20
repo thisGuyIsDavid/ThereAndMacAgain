@@ -1,7 +1,7 @@
 import json
 from itertools import combinations
-from app.WiFiAnalysisModel import WiFiAnalysisModel
-from app.LocalDatabaseService import LocalDatabaseService
+from app.analysis.WiFiAnalysisModel import WiFiAnalysisModel
+from app.databases.LocalDatabaseService import LocalDatabaseService
 from app.utils import haversine
 
 

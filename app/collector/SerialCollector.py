@@ -9,6 +9,9 @@ class SerialCollector:
         self.serial_reader = None
         self.is_reading = False
 
+    def setup(self):
+        self.set_collector()
+
     def set_collector(self):
         if self.serial_port is None:
             return

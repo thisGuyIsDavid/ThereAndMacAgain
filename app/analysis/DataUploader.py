@@ -1,5 +1,5 @@
-from app.LocalDatabaseService import LocalDatabaseService
-from app.SQLiteProcessor import SQLiteProcessor
+from app.databases.LocalDatabaseService import LocalDatabaseService
+from app.databases.SQLiteProcessor import SQLiteProcessor
 import datetime
 
 

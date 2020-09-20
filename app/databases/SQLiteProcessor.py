@@ -12,13 +12,35 @@ class SQLiteProcessor:
 		cursor.execute("SELECT name FROM sqlite_master WHERE type='table' AND name='mac_data';")
 		if len(cursor.fetchall()) == 0:
 			cursor.execute("CREATE TABLE mac_data(id INTEGER PRIMARY KEY AUTOINCREMENT, mac_address TEXT, name TEXT, latitude TEXT, longitude TEXT, timestamp TEXT);")
+
 		self.database_connection.commit()
+
+	def setup_vendors(self):
+		with open('./vendors.txt', encoding='utf-8') as vendor_list:
+			for line in vendor_list:
+				line = line.strip().split('\t')
+				if '\'' in line[1]:
+					line[1] = line[1].replace('\'', '"')
+				cursor = self.database_connection.cursor()
+				cursor.execute(
+					"""
+                    INSERT INTO vendor_data (
+                        mac_address, vendor
+                    ) VALUES (
+                        '%s', '%s'
+                    )
+                    """ % (line[0], line[1])
+				)
+				cursor.close()
+		self.database_connection.commit()
+
+
 
 	def insert_into_sqlite(self, message_dictionary):
 		cursor = self.database_connection.cursor()
 		cursor.execute(
 			"""
-			INSERT INTO mac_data (
+			INSERT INTO vendor_data (
 				mac_address, name, latitude, longitude, timestamp
 			) VALUES (
 				'%s', '%s', '%s', '%s', '%s'
@@ -48,4 +70,4 @@ class SQLiteProcessor:
 		]
 
 if __name__ == '__main__':
-    print((SQLiteProcessor('/Users/davidhaverberg/PycharmProjects/ThereAndMacAgain/data.db').get_data()))
+	SQLiteProcessor('./data.db', run_setup=True).setup_vendors()

@@ -1,4 +1,4 @@
-from app.LocalDatabaseService import LocalDatabaseService
+from app.databases.LocalDatabaseService import LocalDatabaseService
 from app.utils import haversine
 
 

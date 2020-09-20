@@ -1,7 +1,7 @@
 from app.collector.GPSCollector import GPSCollector
 from app.collector.WIFICollector import WIFICollector
-from app.RedisCache import RedisCache
-from app.SQLiteProcessor import SQLiteProcessor
+from app.databases.RedisCache import RedisCache
+from app.databases.SQLiteProcessor import SQLiteProcessor
 
 
 class MainCollector:
@@ -9,10 +9,10 @@ class MainCollector:
     def __init__(self, gps_port, wifi_port, database_location):
 
         self.gps_collector = GPSCollector(gps_port)
-        self.gps_collector.set_collector()
+        self.gps_collector.setup()
 
         self.wifi_collector = WIFICollector(wifi_port)
-        self.wifi_collector.set_collector()
+        self.wifi_collector.setup()
 
         self.redis_cache = RedisCache()
 

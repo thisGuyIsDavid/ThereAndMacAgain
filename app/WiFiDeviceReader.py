@@ -2,8 +2,8 @@
 import time
 import serial
 
-from app.RedisCache import RedisCache
-from app.SQLiteProcessor import SQLiteProcessor
+from app.databases.RedisCache import RedisCache
+from app.databases.SQLiteProcessor import SQLiteProcessor
 from rpi_ws281x import PixelStrip, Color
 
 

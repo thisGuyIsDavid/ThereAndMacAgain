@@ -1,4 +1,4 @@
-from app.LocalDatabaseService import LocalDatabaseService
+from app.databases.LocalDatabaseService import LocalDatabaseService
 import datetime
 from app.utils import haversine
 

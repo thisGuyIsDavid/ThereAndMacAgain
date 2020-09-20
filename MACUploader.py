@@ -1,6 +1,6 @@
 import json
 import datetime
-from app.LocalDatabaseService import LocalDatabaseService
+from app.databases.LocalDatabaseService import LocalDatabaseService
 
 to_insert = []
 to_update = []
