@@ -15,27 +15,6 @@ class SQLiteProcessor:
 
 		self.database_connection.commit()
 
-	def setup_vendors(self):
-		with open('./vendors.txt', encoding='utf-8') as vendor_list:
-			for line in vendor_list:
-				line = line.strip().split('\t')
-				if '\'' in line[1]:
-					line[1] = line[1].replace('\'', '"')
-				cursor = self.database_connection.cursor()
-				cursor.execute(
-					"""
-                    INSERT INTO vendor_data (
-                        mac_address, vendor
-                    ) VALUES (
-                        '%s', '%s'
-                    )
-                    """ % (line[0], line[1])
-				)
-				cursor.close()
-		self.database_connection.commit()
-
-
-
 	def insert_into_sqlite(self, message_dictionary):
 		cursor = self.database_connection.cursor()
 		cursor.execute(
@@ -68,6 +47,3 @@ class SQLiteProcessor:
 				"when_recorded": result[4]
 			} for result in results
 		]
-
-if __name__ == '__main__':
-	SQLiteProcessor('./data.db', run_setup=True).setup_vendors()
