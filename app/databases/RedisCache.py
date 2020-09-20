@@ -12,10 +12,16 @@ class RedisCache:
         while not ping:
             try:
                 ping = self.get_connection().ping()
-                print(ping)
             except:
                 pass
             time.sleep(1)
+        self.clear_cache()
+
+    def clear_cache(self):
+        connection = self.get_connection()
+        for key in ['*']:
+            for redis_key in connection.scan_iter(key):
+                connection.delete(redis_key)
 
     def get_connection(self):
         return redis.from_url(os.getenv('REDIS_URL', 'redis://localhost:6379'))
