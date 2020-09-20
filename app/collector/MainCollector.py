@@ -41,6 +41,7 @@ class MainCollector:
         if self.is_mac_and_location_in_cache(collected_data.get('mac_address'), collected_data.get('latitude'), collected_data.get('longitude')):
             return
         self.sqlite_processor.insert_into_sqlite(collected_data)
+        print(collected_data)
 
     def read_collectors(self):
         while True:
