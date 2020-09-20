@@ -9,10 +9,12 @@ class WIFICollector(SerialCollector):
         wifi_array = line.strip().replace("\n", "").split('|')
         mac_address = str(wifi_array[0])
         mac_address_key = mac_address.replace(':', '').upper()[:6]
+        vendor = self.vendor_map.get(mac_address_key, None)
 
         return {
             "mac_address":mac_address,
             "name": wifi_array[1],
+            "vendor": vendor,
             "key":mac_address_key
         }
 
