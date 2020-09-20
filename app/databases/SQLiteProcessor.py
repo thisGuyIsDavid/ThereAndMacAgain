@@ -19,7 +19,7 @@ class SQLiteProcessor:
 		cursor = self.database_connection.cursor()
 		cursor.execute(
 			"""
-			INSERT INTO vendor_data (
+			INSERT INTO mac_data (
 				mac_address, name, latitude, longitude, timestamp
 			) VALUES (
 				'%s', '%s', '%s', '%s', '%s'
