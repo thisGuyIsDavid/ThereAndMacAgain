@@ -2,7 +2,7 @@ from app.collector.GPSCollector import GPSCollector
 from app.collector.WIFICollector import WIFICollector
 from app.databases.RedisCache import RedisCache
 from app.databases.SQLiteProcessor import SQLiteProcessor
-
+from app.collector.StatusLights import StatusLights
 
 class MainCollector:
 
@@ -18,6 +18,9 @@ class MainCollector:
 
         # set SQLite processor
         self.sqlite_processor = SQLiteProcessor(database_location=database_location, run_setup=True)
+
+        #   Status Lights
+        self.status_lights = StatusLights()
 
     def is_in_mac_address_cache(self, mac_address):
         # check cache. This is for when the device is in motion.
@@ -36,38 +39,41 @@ class MainCollector:
             return False
 
     def process_collected_data(self, collected_data):
-
         if self.is_in_mac_address_cache(collected_data.get('mac_address')):
             return
         if self.is_mac_and_location_in_cache(collected_data.get('mac_address'), collected_data.get('latitude'), collected_data.get('longitude')):
             return
-        self.sqlite_processor.insert_into_sqlite(collected_data)
 
+        self.status_lights.set_process_status(1)
+        self.sqlite_processor.insert_into_sqlite(collected_data)
         if collected_data.get('vendor') is None:
             return
 
-
-        print(collected_data.get('vendor'), collected_data.get('mac_address')[-8:])
-
     def read_collectors(self):
+        self.status_lights.set_program_status(1)
         while True:
             try:
+                #   reset process light
+                self.status_lights.set_process_status(0)
+
                 gps_data = self.gps_collector.get_line()
                 if gps_data is None:
+                    self.status_lights.set_gps_status(-1)
                     continue
+                self.status_lights.set_gps_status(1)
+
                 wifi_data = self.wifi_collector.get_line()
                 if wifi_data is None:
+                    self.status_lights.set_wifi_status(-1)
                     continue
+                self.status_lights.set_wifi_status(0)
+
                 collected_data = {**gps_data, **wifi_data}
 
                 self.process_collected_data(collected_data)
-
             except Exception as e:
                 print(e)
                 continue
-
-
-
 
     def run(self):
         try:
@@ -78,4 +84,5 @@ class MainCollector:
             with open('errorlog.txt', 'a') as error_log:
                 error_log.write(str(e))
         finally:
-           pass
+            self.status_lights.set_program_status(0)
+            pass
