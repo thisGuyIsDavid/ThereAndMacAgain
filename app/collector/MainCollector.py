@@ -51,11 +51,9 @@ class MainCollector:
                 gps_data = self.gps_collector.get_line()
                 if gps_data is None:
                     continue
-                print(gps_data)
                 wifi_data = self.wifi_collector.get_line()
                 if wifi_data is None:
                     continue
-                print(wifi_data)
                 collected_data = {**gps_data, **wifi_data}
 
                 self.process_collected_data(collected_data)

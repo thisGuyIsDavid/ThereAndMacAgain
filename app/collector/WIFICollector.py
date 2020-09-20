@@ -8,9 +8,7 @@ class WIFICollector(SerialCollector):
     def process_line(self, line):
         wifi_array = line.strip().replace("\n", "").split('|')
         mac_address = str(wifi_array[0])
-        mac_address_key = mac_address[:6].replace(':', '').upper()
-
-
+        mac_address_key = mac_address.replace(':', '').upper()[:6]
 
         return {
             "mac_address":mac_address,
