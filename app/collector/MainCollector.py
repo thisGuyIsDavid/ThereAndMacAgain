@@ -1,8 +1,9 @@
 from app.collector.GPSCollector import GPSCollector
 from app.collector.WIFICollector import WIFICollector
-from app.databases.RedisCache import RedisCache
 from app.databases.SQLiteProcessor import SQLiteProcessor
 from app.collector.StatusLights import StatusLights
+from app.collector.CollectorCache import CollectorCache
+
 
 class MainCollector:
 
@@ -14,7 +15,7 @@ class MainCollector:
         self.wifi_collector = WIFICollector(wifi_port)
         self.wifi_collector.setup()
 
-        self.redis_cache = RedisCache()
+        self.cache = CollectorCache()
 
         # set SQLite processor
         self.sqlite_processor = SQLiteProcessor(database_location=database_location, run_setup=True)
@@ -24,18 +25,18 @@ class MainCollector:
 
     def is_in_mac_address_cache(self, mac_address):
         # check cache. This is for when the device is in motion.
-        if self.redis_cache.is_key_in_store(mac_address):
+        if self.cache.is_in_cache(mac_address):
             return True
         else:
-            self.redis_cache.set_key(mac_address, 1, 30)
+            self.cache.add_to_cache(mac_address, 30)
             return False
 
     def is_mac_and_location_in_cache(self, mac_address, latitude, longitude):
         key_name = "%s_%s_%s" % (mac_address, latitude, longitude)
-        if self.redis_cache.is_key_in_store(key_name):
+        if self.cache.is_in_cache(key_name):
             return True
         else:
-            self.redis_cache.set_key(key_name, 1, 6000)
+            self.cache.add_to_cache(key_name, 6000)
             return False
 
     def process_collected_data(self, collected_data):

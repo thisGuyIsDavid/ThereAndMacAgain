@@ -1,6 +1,6 @@
 # !/usr/bin/env python
 from app.collector.SerialCollector import SerialCollector
-
+import os
 
 class WIFICollector(SerialCollector):
     vendor_map = {}
@@ -20,9 +20,10 @@ class WIFICollector(SerialCollector):
 
     def setup(self):
         self.set_collector()
-        with open('/home/pi/vendors.txt', encoding='utf-8') as vendor_list:
-            for line in vendor_list:
-                line = line.strip().split('\t')
-                self.vendor_map[line[0]] = line[1]
+        if os.path.exists('/home/pi/vendors.txt'):
+            with open('/home/pi/vendors.txt', encoding='utf-8') as vendor_list:
+                for line in vendor_list:
+                    line = line.strip().split('\t')
+                    self.vendor_map[line[0]] = line[1]
 
 
