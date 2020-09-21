@@ -2,7 +2,7 @@ import datetime
 
 
 class CollectorCache:
-    ADDS_PER_CLEAN = 100
+    ADDS_PER_CLEAN = 10
     count_adds = 0
 
     cache = {}
