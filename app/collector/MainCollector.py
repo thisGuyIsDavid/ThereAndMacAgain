@@ -49,6 +49,7 @@ class MainCollector:
         self.sqlite_processor.insert_into_sqlite(collected_data)
         if collected_data.get('vendor') is None:
             return
+        print(collected_data)
 
     def read_collectors(self):
         self.status_lights.set_program_status(1)

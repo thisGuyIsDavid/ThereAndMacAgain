@@ -2,6 +2,7 @@
 from app.collector.SerialCollector import SerialCollector
 import os
 
+
 class WIFICollector(SerialCollector):
     vendor_map = {}
 
