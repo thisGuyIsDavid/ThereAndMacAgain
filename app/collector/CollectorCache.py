@@ -25,7 +25,9 @@ class CollectorCache:
         return key
 
     def clean(self):
-        for key, value in self.cache.items():
-            if value < datetime.datetime.now():
-                del self.cache[key]
+        keys_to_delete = [key for key, value in self.cache.items() if value < datetime.datetime.now()]
+        print("removing %s keys, %s remain" % (len(keys_to_delete), len(self.cache) - len(keys_to_delete)))
+        for key in keys_to_delete:
+            del self.cache[key]
+
         self.count_adds = 0
