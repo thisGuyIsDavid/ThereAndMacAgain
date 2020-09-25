@@ -94,6 +94,6 @@ class MainCollector:
             with open('errorlog.txt', 'a') as error_log:
                 error_log.write(str(e))
         finally:
-            self.status_lights.set_program_status(0)
             self.lcd_screen.lcd_clear()
+            self.status_lights.clear()
             pass

@@ -45,3 +45,7 @@ class StatusLights:
 
         if status == 1:
             self.set_light(self.PROCESS_LIGHT, Color(0, 0, 255))
+
+    def clear(self):
+        for pin in [self.PROGRAM_LIGHT, self.GPS_LIGHT, self.WIFI_LIGHT, self.PROCESS_LIGHT, self.MISC_LIGHT]:
+            self.set_light_status(pin, 0)
