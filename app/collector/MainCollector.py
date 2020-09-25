@@ -55,7 +55,7 @@ class MainCollector:
             return
         self.lcd_screen.lcd_clear()
         self.lcd_screen.lcd_display_string(collected_data.get('vendor'), 1)
-        self.lcd_screen.lcd_display_string(collected_data.get('mac_address')[8:], 2)
+        self.lcd_screen.lcd_display_string(collected_data.get('mac_address')[p:], 2)
 
         print(collected_data)
 
@@ -76,7 +76,7 @@ class MainCollector:
                 if wifi_data is None:
                     self.status_lights.set_wifi_status(-1)
                     continue
-                self.status_lights.set_wifi_status(0)
+                self.status_lights.set_wifi_status(1)
 
                 collected_data = {**gps_data, **wifi_data}
 
