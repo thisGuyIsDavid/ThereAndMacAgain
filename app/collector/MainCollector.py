@@ -95,4 +95,5 @@ class MainCollector:
                 error_log.write(str(e))
         finally:
             self.status_lights.set_program_status(0)
+            self.lcd_screen.lcd_clear()
             pass
