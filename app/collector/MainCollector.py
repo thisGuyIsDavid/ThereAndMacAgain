@@ -3,6 +3,7 @@ from app.collector.WIFICollector import WIFICollector
 from app.databases.SQLiteProcessor import SQLiteProcessor
 from app.collector.StatusLights import StatusLights
 from app.collector.CollectorCache import CollectorCache
+from app.displays import I2CDisplayDriver
 
 
 class MainCollector:
@@ -22,6 +23,9 @@ class MainCollector:
 
         #   Status Lights
         self.status_lights = StatusLights()
+
+        self.lcd_screen = I2CDisplayDriver.lcd()
+
 
     def is_in_mac_address_cache(self, mac_address):
         # check cache. This is for when the device is in motion.
@@ -49,6 +53,9 @@ class MainCollector:
         self.sqlite_processor.insert_into_sqlite(collected_data)
         if collected_data.get('vendor') is None:
             return
+
+        self.lcd_screen.lcd_display_string(collected_data.get('vendor'), 1)
+
         print(collected_data)
 
     def read_collectors(self):

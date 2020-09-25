@@ -5,6 +5,7 @@ import serial
 from app.databases.RedisCache import RedisCache
 from app.databases.SQLiteProcessor import SQLiteProcessor
 from rpi_ws281x import PixelStrip, Color
+from app.displays import I2CDisplayDriver
 
 
 class WiFiDeviceReader:
@@ -32,6 +33,9 @@ class WiFiDeviceReader:
 
 		# set SQLite processor
 		self.sqlite_processor = SQLiteProcessor(database_location=database_location, run_setup=True)
+
+		# set display
+		self.lcd_screen = I2CDisplayDriver.lcd()
 
 		# set status lights
 		self.status_light = PixelStrip(8, 18, 800000, 10, False, 100, 0)
