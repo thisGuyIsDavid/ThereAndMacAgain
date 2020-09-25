@@ -8,7 +8,7 @@ class DataUploader:
     last_collection_date = None
 
     def set_data(self):
-        results = SQLiteProcessor('/Users/davidhaverberg/PycharmProjects/ThereAndMacAgain/data.db').get_data()
+        results = SQLiteProcessor('/Users/davidhaverberg/PycharmProjects/ThereAndMacAgain/tama.db').get_data()
         if results is None:
             return
         to_insert = []
