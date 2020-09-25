@@ -53,7 +53,7 @@ class MainCollector:
         self.sqlite_processor.insert_into_sqlite(collected_data)
         if collected_data.get('vendor') is None:
             return
-
+        self.lcd_screen.lcd_clear()
         self.lcd_screen.lcd_display_string(collected_data.get('vendor'), 1)
 
         print(collected_data)
