@@ -55,7 +55,7 @@ class MainCollector:
             return
         self.lcd_screen.lcd_clear()
         self.lcd_screen.lcd_display_string(collected_data.get('vendor'), 1)
-        self.lcd_screen.lcd_display_string(collected_data.get('mac_address')[p:], 2)
+        self.lcd_screen.lcd_display_string(collected_data.get('mac_address')[9:], 2)
 
         print(collected_data)
 
