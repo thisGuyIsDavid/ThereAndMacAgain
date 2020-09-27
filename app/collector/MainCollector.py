@@ -4,6 +4,7 @@ from app.databases.SQLiteProcessor import SQLiteProcessor
 from app.collector.StatusLights import StatusLights
 from app.collector.CollectorCache import CollectorCache
 from app.displays import I2CDisplayDriver
+from app.collector.Display import Display
 
 
 class MainCollector:
@@ -24,8 +25,8 @@ class MainCollector:
         #   Status Lights
         self.status_lights = StatusLights()
 
-        self.lcd_screen = I2CDisplayDriver.lcd()
 
+        self.display = Display()
 
     def is_in_mac_address_cache(self, mac_address):
         # check cache. This is for when the device is in motion.
@@ -53,11 +54,10 @@ class MainCollector:
         self.sqlite_processor.insert_into_sqlite(collected_data)
         if collected_data.get('vendor') is None:
             return
-        self.lcd_screen.lcd_clear()
-        self.lcd_screen.lcd_display_string(collected_data.get('vendor'), 1)
-        self.lcd_screen.lcd_display_string(collected_data.get('mac_address').replace(":", " ")[9:].upper(), 2)
-
-        print(collected_data)
+        self.display.set_message(
+            collected_data.get('vendor'),
+            collected_data.get('mac_address').replace(":", " ")[9:].upper()
+        )
 
     def read_collectors(self):
         self.status_lights.set_program_status(1)
@@ -94,6 +94,6 @@ class MainCollector:
             with open('errorlog.txt', 'a') as error_log:
                 error_log.write(str(e))
         finally:
-            self.lcd_screen.lcd_clear()
+            self.display.clear()
             self.status_lights.clear()
             pass

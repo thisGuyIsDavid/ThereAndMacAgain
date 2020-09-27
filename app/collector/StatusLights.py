@@ -1,5 +1,5 @@
 from rpi_ws281x import PixelStrip, Color
-import time
+
 
 class StatusLights:
     PROGRAM_LIGHT = 0
