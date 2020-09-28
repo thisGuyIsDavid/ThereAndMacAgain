@@ -47,15 +47,19 @@ class MainCollector:
             return False
 
     def process_collected_data(self, collected_data):
-        if self.is_in_mac_address_cache(collected_data.get('mac_address')):
-            return
-        if self.is_mac_and_location_in_cache(collected_data.get('mac_address'), collected_data.get('latitude'), collected_data.get('longitude')):
-            return
+        #   if there is no keypad press, do standard caching.
+        if collected_data.get('key_value') is None:
+            if self.is_in_mac_address_cache(collected_data.get('mac_address')):
+                return
+            if self.is_mac_and_location_in_cache(collected_data.get('mac_address'), collected_data.get('latitude'), collected_data.get('longitude')):
+                return
 
         self.status_lights.set_process_status(1)
         self.sqlite_processor.insert_into_sqlite(collected_data)
+
         if collected_data.get('vendor') is None:
             return
+
         self.display.set_message(
             collected_data.get('vendor'),
             collected_data.get('mac_address').replace(":", " ")[9:].upper()
@@ -65,8 +69,6 @@ class MainCollector:
         self.status_lights.set_program_status(1)
         while True:
             try:
-                print(self.keypad.get_key_value())
-
                 #   reset process light
                 self.status_lights.set_process_status(0)
 
@@ -83,6 +85,7 @@ class MainCollector:
                 self.status_lights.set_wifi_status(1)
 
                 collected_data = {**gps_data, **wifi_data}
+                collected_data['key_value'] = self.keypad.get_key_value()
 
                 self.process_collected_data(collected_data)
             except Exception as e:
