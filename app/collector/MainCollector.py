@@ -5,7 +5,7 @@ from app.collector.StatusLights import StatusLights
 from app.collector.CollectorCache import CollectorCache
 from app.displays import I2CDisplayDriver
 from app.collector.Display import Display
-
+from app.collector.Keypad import Keypad
 
 class MainCollector:
 
@@ -25,6 +25,8 @@ class MainCollector:
         #   Status Lights
         self.status_lights = StatusLights()
 
+        #   Keypad
+        self.keypad = Keypad()
 
         self.display = Display()
 
@@ -63,6 +65,8 @@ class MainCollector:
         self.status_lights.set_program_status(1)
         while True:
             try:
+                print(self.keypad.get_key_value())
+
                 #   reset process light
                 self.status_lights.set_process_status(0)
 
