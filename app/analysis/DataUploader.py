@@ -47,7 +47,7 @@ class DataUploader:
             """
             INSERT IGNORE INTO mac_individuals (id, name) VALUES (%(id)s, %(name)s)
             """,
-            [{'id': x.get('mac_address'), 'name': x.get('name')} for x in to_insert]
+            [{'id': x.get('mac_address'), 'name': x.get('name') if x.get('name') != 'None' else None} for x in to_insert]
         )
 
     def insert_collected_data(self):
