@@ -48,3 +48,7 @@ class SQLiteProcessor:
 				"key": result[5]
 			} for result in results
 		]
+
+if __name__ == '__main__':
+	x = SQLiteProcessor("/Users/davidhaverberg/PycharmProjects/ThereAndMacAgain/tama.db").get_data()
+	print(x)

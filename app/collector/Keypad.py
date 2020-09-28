@@ -15,4 +15,4 @@ class Keypad:
     def get_key_value(self):
         keys = self.keypad.pressed_keys
         if keys:
-            return keys
+            return keys[0]

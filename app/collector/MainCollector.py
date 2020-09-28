@@ -69,6 +69,10 @@ class MainCollector:
         self.status_lights.set_program_status(1)
         while True:
             try:
+                pressed_key = self.keypad.get_key_value()
+                if pressed_key is not None:
+                    print(pressed_key)
+
                 #   reset process light
                 self.status_lights.set_process_status(0)
 
@@ -85,7 +89,7 @@ class MainCollector:
                 self.status_lights.set_wifi_status(1)
 
                 collected_data = {**gps_data, **wifi_data}
-                collected_data['key_value'] = self.keypad.get_key_value()
+                collected_data['key_value'] = pressed_key
 
                 self.process_collected_data(collected_data)
             except Exception as e:
