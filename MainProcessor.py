@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 from app.databases.SQLiteProcessor import SQLiteProcessor
 from app.collector.CollectorCache import CollectorCache
 from app.collector.Display import Display
@@ -27,20 +26,15 @@ class MainProcessor:
             return False
 
     def process(self, received_data):
-        mac_address = received_data.get('mac_address')
         if self.is_mac_and_location_in_cache(received_data):
             return
 
-        print(mac_address)
+        self.sqlite_processor.insert_into_sqlite(received_data)
 
         if received_data.get('vendor') is None:
             return
 
-        self.display.set_message(
-            received_data.get('vendor'),
-            received_data.get('mac_address').replace(":", " ")[9:].upper()
-        )
-        self.sqlite_processor.insert_into_sqlite(received_data)
+        self.display.set_message(received_data.get('vendor'), received_data.get('mac_address').replace(":", " ")[9:].upper())
 
 
 if __name__ == '__main__':

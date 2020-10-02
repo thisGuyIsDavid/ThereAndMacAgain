@@ -2,7 +2,6 @@ import json
 
 import pika
 
-from app.collector.CollectorCache import CollectorCache
 from app.collector.GPSCollector import GPSCollector
 from app.collector.Keypad import Keypad
 from app.collector.StatusLights import StatusLights
@@ -76,3 +75,6 @@ class MainCollector:
         finally:
             self.status_lights.clear()
             self.message_queue_connection.close()
+
+if __name__ == '__main__':
+    MainCollector(wifi_port='/dev/ttyUSB1', gps_port='/dev/ttyUSB0').run()
