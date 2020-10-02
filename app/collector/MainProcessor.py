@@ -1,14 +1,12 @@
 #!/usr/bin/env python
-import pika, sys, os, json
+from app.databases.SQLiteProcessor import SQLiteProcessor
 
 
 class MainProcessor:
 
-    def __init__(self):
-        pass
-
+    def __init__(self, database_location):
+        # set SQLite processor
+        self.sqlite_processor = SQLiteProcessor(database_location=database_location, run_setup=True)
 
     def process(self, to_process):
-        print(to_process)
-
-    pass
+        self.sqlite_processor.insert_into_sqlite(to_process)

@@ -26,8 +26,7 @@ class MainCollector:
         self.message_queue = None
         self.set_messaging_queue()
 
-        # set SQLite processor
-        self.sqlite_processor = SQLiteProcessor(database_location=database_location, run_setup=True)
+
 
         #   Status Lights
         self.status_lights = StatusLights()
