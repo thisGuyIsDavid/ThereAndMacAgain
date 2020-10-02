@@ -6,6 +6,8 @@ from app.collector.CollectorCache import CollectorCache
 from app.displays import I2CDisplayDriver
 from app.collector.Display import Display
 from app.collector.Keypad import Keypad
+import pika
+
 
 class MainCollector:
 
@@ -19,6 +21,11 @@ class MainCollector:
 
         self.cache = CollectorCache()
 
+        #   set message queue
+        self.message_queue_connection = None
+        self.message_queue = None
+        self.set_messaging_queue()
+
         # set SQLite processor
         self.sqlite_processor = SQLiteProcessor(database_location=database_location, run_setup=True)
 
@@ -29,6 +36,12 @@ class MainCollector:
         self.keypad = Keypad()
 
         self.display = Display()
+
+    def set_messaging_queue(self):
+        #   Messaging Queue
+        self.message_queue_connection = pika.BlockingConnection(pika.ConnectionParameters('localhost'))
+        self.message_queue = self.message_queue_connection.channel()
+        self.message_queue.queue_declare(queue='there_and_mac_again')
 
     def is_in_mac_address_cache(self, mac_address):
         # check cache. This is for when the device is in motion.
@@ -55,8 +68,8 @@ class MainCollector:
                 return
 
         self.status_lights.set_process_status(1)
-        self.sqlite_processor.insert_into_sqlite(collected_data)
 
+        self.message_queue.basic_publish(exchange='', routing_key='there_and_mac_again', body=collected_data)
         if collected_data.get('vendor') is None:
             return
 
@@ -105,4 +118,5 @@ class MainCollector:
         finally:
             self.display.clear()
             self.status_lights.clear()
+            self.message_queue_connection.close()
             pass
