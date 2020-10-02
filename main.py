@@ -4,7 +4,6 @@ from app.displays import I2CDisplayDriver
 from time import *
 
 
-
 if __name__ == '__main__':
     MainCollector(
         wifi_port='/dev/ttyUSB1',

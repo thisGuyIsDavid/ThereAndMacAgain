@@ -3,11 +3,11 @@ from app.collector.WIFICollector import WIFICollector
 from app.databases.SQLiteProcessor import SQLiteProcessor
 from app.collector.StatusLights import StatusLights
 from app.collector.CollectorCache import CollectorCache
-from app.displays import I2CDisplayDriver
 from app.collector.Display import Display
 from app.collector.Keypad import Keypad
 import pika
 import json
+
 
 class MainCollector:
 
