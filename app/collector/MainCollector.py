@@ -7,7 +7,7 @@ from app.displays import I2CDisplayDriver
 from app.collector.Display import Display
 from app.collector.Keypad import Keypad
 import pika
-
+import json
 
 class MainCollector:
 
@@ -69,7 +69,7 @@ class MainCollector:
 
         self.status_lights.set_process_status(1)
 
-        self.message_queue.basic_publish(exchange='', routing_key='there_and_mac_again', body=collected_data)
+        self.message_queue.basic_publish(exchange='', routing_key='there_and_mac_again', body=json.dumps(collected_data))
         if collected_data.get('vendor') is None:
             return
 
