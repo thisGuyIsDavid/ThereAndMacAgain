@@ -2,7 +2,7 @@
 import json
 import pika
 
-from app.collector.MainProcessor import MainProcessor
+from MainProcessor import MainProcessor
 
 if __name__ == '__main__':
     #   set processor

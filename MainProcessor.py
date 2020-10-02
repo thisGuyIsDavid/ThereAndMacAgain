@@ -2,6 +2,8 @@
 from app.databases.SQLiteProcessor import SQLiteProcessor
 from app.collector.CollectorCache import CollectorCache
 from app.collector.Display import Display
+import json
+import pika
 
 
 class MainProcessor:
@@ -39,3 +41,22 @@ class MainProcessor:
             received_data.get('mac_address').replace(":", " ")[9:].upper()
         )
         self.sqlite_processor.insert_into_sqlite(received_data)
+
+
+if __name__ == '__main__':
+    #   set processor
+    main_processor = MainProcessor(database_location='/home/pi/tama.db')
+
+    #   set consumer
+    connection = pika.BlockingConnection(pika.ConnectionParameters(host='localhost'))
+    channel = connection.channel()
+    channel.queue_declare(queue='there_and_mac_again')
+
+    #   set callback
+    def callback(ch, method, properties, body):
+        received_data = json.loads(body)
+        main_processor.process(received_data)
+
+    #   start listening
+    channel.basic_consume(queue='there_and_mac_again', on_message_callback=callback, auto_ack=True)
+    channel.start_consuming()
