@@ -1,5 +1,6 @@
 #!/usr/bin/env python
-import pika, sys, os
+import pika, sys, os, json
+
 
 
 def main():
@@ -9,11 +10,11 @@ def main():
     channel.queue_declare(queue='there_and_mac_again')
 
     def callback(ch, method, properties, body):
-        print(" [x] Received %r" % body)
+        received_data = json.loads(body)
+
+        print(" [x] Received %r" % received_data)
 
     channel.basic_consume(queue='there_and_mac_again', on_message_callback=callback, auto_ack=True)
-
-    print(' [*] Waiting for messages. To exit press CTRL+C')
     channel.start_consuming()
 
 if __name__ == '__main__':
