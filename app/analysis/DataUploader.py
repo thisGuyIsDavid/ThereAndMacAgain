@@ -13,8 +13,13 @@ class DataUploader:
             return
         to_insert = []
         for result in results:
+            if 'key' not in result:
+                print(result)
+                continue
             try:
                 result['when_recorded'] = datetime.datetime.strptime(result['when_recorded'][:-3], '%m/%d/%Y %H:%M:%S')
+                if result['key'] == 'None' or '[' in result['key']:
+                    result['key'] = None
                 to_insert.append(result)
             except ValueError:
                 continue
@@ -52,12 +57,13 @@ class DataUploader:
 
     def insert_collected_data(self):
         print('Inserting %s new records' % (len(self.data_to_upload)))
+        print(self.data_to_upload)
         LocalDatabaseService().insert_many(
             """
             INSERT IGNORE INTO mac_location_data (
-                mac_address, latitude, longitude, when_recorded
+                mac_address, latitude, longitude, when_recorded, marker
             ) VALUES (
-                %(mac_address)s, %(latitude)s, %(longitude)s, %(when_recorded)s
+                %(mac_address)s, %(latitude)s, %(longitude)s, %(when_recorded)s, %(key)s
             )
             """, self.data_to_upload
         )

@@ -70,8 +70,6 @@ class MainCollector:
         while True:
             try:
                 pressed_key = self.keypad.get_key_value()
-                if pressed_key is not None:
-                    print(pressed_key)
 
                 #   reset process light
                 self.status_lights.set_process_status(0)

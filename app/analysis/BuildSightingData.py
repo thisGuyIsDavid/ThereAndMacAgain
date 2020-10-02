@@ -30,7 +30,7 @@ class BuildSightingData:
 								ON mac_vendors.id = LEFT(acceptable_macs.mac_address, 6)
 							JOIN mac_vendor_companies
 								ON mac_vendor_companies.id = mac_vendors.company_id
-							WHERE time_diff > 24 AND type != 'networking'
+							WHERE time_diff > 3 AND type != 'networking'
 			) AS encountered_macs
 			JOIN (
 				SELECT mac_address, 
