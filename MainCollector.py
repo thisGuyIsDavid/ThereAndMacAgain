@@ -19,13 +19,13 @@ class MainCollector:
         self.wifi_collector = WIFICollector(wifi_port)
         self.wifi_collector.setup()
 
+        #   Status Lights
+        self.status_lights = StatusLights()
+
         #   set message queue
         self.message_queue_connection = None
         self.message_queue = None
         self.set_messaging_queue()
-
-        #   Status Lights
-        self.status_lights = StatusLights()
 
         #   Keypad
         self.keypad = Keypad()
