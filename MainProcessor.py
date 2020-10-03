@@ -2,7 +2,8 @@ from app.databases.SQLiteProcessor import SQLiteProcessor
 from app.collector.CollectorCache import CollectorCache
 from app.collector.Display import Display
 import json
-import pika
+import pika, time
+from pika.exceptions import AMQPConnectionError
 
 
 class MainProcessor:
@@ -16,6 +17,23 @@ class MainProcessor:
 
         #   set display
         self.display = Display()
+
+        #   set message queue
+        self.message_queue_connection = None
+        self.message_queue = None
+        self.set_messaging_queue()
+
+    def set_messaging_queue(self):
+        #   Messaging Queue - try setting 30 times.
+        for i in range(30):
+            try:
+                self.message_queue_connection = pika.BlockingConnection(pika.ConnectionParameters('localhost'))
+                self.message_queue = self.message_queue_connection.channel()
+                self.message_queue.queue_declare(queue='there_and_mac_again')
+                break
+            except AMQPConnectionError:
+                print('connection error')
+                time.sleep(5)
 
     def is_mac_and_location_in_cache(self, received_data):
         cache_key = "%s_%s_%s" % (received_data.get('mac_address'), received_data.get('latitude'), received_data.get('longitude'))
@@ -36,21 +54,37 @@ class MainProcessor:
 
         self.display.set_message(received_data.get('vendor'), received_data.get('mac_address').replace(":", " ")[9:].upper())
 
+    @staticmethod
+    def consume():
+        #   set processor
+        main_processor = MainProcessor(database_location='/home/pi/tama.db')
+
+        #   set connection
+        connection = None
+        channel = None
+
+        for i in range(30):
+            try:
+                connection = pika.BlockingConnection(pika.ConnectionParameters(host='localhost'))
+                channel = connection.channel()
+                channel.queue_declare(queue='there_and_mac_again')
+                break
+            except AMQPConnectionError:
+                print('connection error')
+                time.sleep(5)
+
+        if connection is None or channel is None:
+            main_processor.display.set_message("RQ FAILED", "")
+
+        #   set callback
+        def callback(ch, method, properties, body):
+            received_data = json.loads(body)
+            main_processor.process(received_data)
+
+        #   start listening
+        channel.basic_consume(queue='there_and_mac_again', on_message_callback=callback, auto_ack=True)
+        channel.start_consuming()
+
 
 if __name__ == '__main__':
-    #   set processor
-    main_processor = MainProcessor(database_location='/home/pi/tama.db')
-
-    #   set consumer
-    connection = pika.BlockingConnection(pika.ConnectionParameters(host='localhost'))
-    channel = connection.channel()
-    channel.queue_declare(queue='there_and_mac_again')
-
-    #   set callback
-    def callback(ch, method, properties, body):
-        received_data = json.loads(body)
-        main_processor.process(received_data)
-
-    #   start listening
-    channel.basic_consume(queue='there_and_mac_again', on_message_callback=callback, auto_ack=True)
-    channel.start_consuming()
+    MainProcessor.consume()
