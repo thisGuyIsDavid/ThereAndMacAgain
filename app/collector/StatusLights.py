@@ -39,6 +39,9 @@ class StatusLights:
     def set_wifi_status(self, status):
         self.set_light_status(self.WIFI_LIGHT, status)
 
+    def set_misc_status(self, status):
+        self.set_light_status(self.MISC_LIGHT, status)
+
     def set_process_status(self, status):
         if status == 0:
             self.set_light(self.PROCESS_LIGHT, Color(0, 0, 0))

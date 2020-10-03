@@ -1,7 +1,8 @@
 import json
 
 import pika
-
+import time
+from pika.exceptions import AMQPConnectionError
 from app.collector.GPSCollector import GPSCollector
 from app.collector.Keypad import Keypad
 from app.collector.StatusLights import StatusLights
@@ -30,10 +31,18 @@ class MainCollector:
         self.keypad = Keypad()
 
     def set_messaging_queue(self):
-        #   Messaging Queue
-        self.message_queue_connection = pika.BlockingConnection(pika.ConnectionParameters('localhost'))
-        self.message_queue = self.message_queue_connection.channel()
-        self.message_queue.queue_declare(queue='there_and_mac_again')
+        #   Messaging Queue - try setting 30 times.
+        self.status_lights.set_program_status(-1)
+        for i in range(30):
+            try:
+                self.message_queue_connection = pika.BlockingConnection(pika.ConnectionParameters('localhost'))
+                self.message_queue = self.message_queue_connection.channel()
+                self.message_queue.queue_declare(queue='there_and_mac_again')
+                self.status_lights.set_misc_status(1)
+                break
+            except AMQPConnectionError:
+                print('connection error')
+                time.sleep(5)
 
     def read_collectors(self):
         self.status_lights.set_program_status(1)
@@ -59,6 +68,7 @@ class MainCollector:
                 collected_data = {**gps_data, **wifi_data}
                 collected_data['key_value'] = pressed_key
 
+                self.status_lights.set_process_status(1)
                 self.message_queue.basic_publish(exchange='', routing_key='there_and_mac_again', body=json.dumps(collected_data))
             except Exception as e:
                 print(e)
