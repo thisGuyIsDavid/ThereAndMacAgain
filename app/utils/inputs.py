@@ -2561,11 +2561,6 @@ class Keyboard(InputDevice):
 
     @staticmethod
     def _get_target_function():
-        """Get the correct target function."""
-        if WIN:
-            return keyboard_process
-        if MAC:
-            return mac_keyboard_process
         return None
 
     def _get_data(self, read_size):
@@ -2573,55 +2568,6 @@ class Keyboard(InputDevice):
         if NIX:
             return super(Keyboard, self)._get_data(read_size)
         return self._pipe.recv_bytes()
-
-
-class Mouse(InputDevice):
-    """A mouse or other pointing-like device.
-    """
-
-    def _set_device_path(self):
-        super(Mouse, self)._set_device_path()
-        if MAC:
-            self._device_path = APPKIT_MOUSE_PATH
-
-    def _set_name(self):
-        super(Mouse, self)._set_name()
-        if WIN:
-            self.name = "Microsoft Mouse"
-        elif MAC:
-            self.name = "AppKit Mouse"
-
-    @staticmethod
-    def _get_target_function():
-        """Get the correct target function."""
-        if WIN:
-            return mouse_process
-        if MAC:
-            return appkit_mouse_process
-        return None
-
-    def _get_data(self, read_size):
-        """Get data from the character device."""
-        if NIX:
-            return super(Mouse, self)._get_data(read_size)
-        return self._pipe.recv_bytes()
-
-
-class MightyMouse(Mouse):
-    """A mouse or other pointing device on the Mac."""
-
-    def _set_device_path(self):
-        super(MightyMouse, self)._set_device_path()
-        if MAC:
-            self._device_path = QUARTZ_MOUSE_PATH
-
-    def _set_name(self):
-        self.name = "Quartz Mouse"
-
-    @staticmethod
-    def _get_target_function():
-        """Get the correct target function."""
-        return quartz_mouse_process
 
 
 def delay_and_stop(duration, dll, device_number):
@@ -2688,12 +2634,7 @@ class DeviceManager(object):  # pylint: disable=useless-object-inheritance
 
     def _post_init(self):
         """Call the find devices method for the relevant platform."""
-        if WIN:
-            self._find_devices_win()
-        elif MAC:
-            self._find_devices_mac()
-        else:
-            self._find_devices()
+        self._find_devices()
         self._update_all_devices()
 
     def _update_all_devices(self):
@@ -2724,9 +2665,6 @@ class DeviceManager(object):  # pylint: disable=useless-object-inheritance
         if device_type == 'kbd':
             self.keyboards.append(Keyboard(self, device_path,
                                            char_path_override))
-        elif device_type == 'mouse':
-            self.mice.append(Mouse(self, device_path,
-                                   char_path_override))
         else:
             self.other_devices.append(OtherDevice(self,
                                                   device_path,
@@ -2748,26 +2686,6 @@ class DeviceManager(object):  # pylint: disable=useless-object-inheritance
             warn(
                 "No xinput driver dll found, gamepads not supported.",
                 RuntimeWarning)
-
-    def _find_devices_win(self):
-        """Find devices on Windows."""
-        self._find_xinput()
-        self._count_devices()
-        if self._raw_device_counts['keyboards'] > 0:
-            self.keyboards.append(Keyboard(
-                self,
-                "/dev/input/by-id/usb-A_Nice_Keyboard-event-kbd"))
-
-        if self._raw_device_counts['mice'] > 0:
-            self.mice.append(Mouse(
-                self,
-                "/dev/input/by-id/usb-A_Nice_Mouse_called_Arthur-event-mouse"))
-
-    def _find_devices_mac(self):
-        """Find devices on Mac."""
-        self.keyboards.append(Keyboard(self))
-        self.mice.append(MightyMouse(self))
-        self.mice.append(Mouse(self))
 
     def _count_devices(self):
         """See what Windows' GetRawInputDeviceList wants to tell us.
