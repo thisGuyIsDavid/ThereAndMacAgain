@@ -57,7 +57,6 @@ class DataUploader:
 
     def insert_collected_data(self):
         print('Inserting %s new records' % (len(self.data_to_upload)))
-        print(self.data_to_upload)
         LocalDatabaseService().insert_many(
             """
             INSERT IGNORE INTO mac_location_data (

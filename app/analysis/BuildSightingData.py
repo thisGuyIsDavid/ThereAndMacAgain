@@ -19,18 +19,20 @@ class BuildSightingData:
 			SELECT encountered_macs.mac_address, latitude, longitude, when_recorded, mac_vendors.vendor, mac_individuals.name, mac_vendor_companies.name, is_node, mac_data.name
 			FROM 
 			(
-				SELECT mac_address, mac_vendor_companies.* FROM 
-								#	mac addresses that have been seen at least one hour apart.
-								(	
-									SELECT mac_address, TIMESTAMPDIFF(HOUR, MIN(when_recorded), MAX(when_recorded)) AS time_diff
-									FROM mac_location_data 
-									GROUP BY mac_address
-								) AS acceptable_macs
-							JOIN mac_vendors
-								ON mac_vendors.id = LEFT(acceptable_macs.mac_address, 6)
-							JOIN mac_vendor_companies
-								ON mac_vendor_companies.id = mac_vendors.company_id
-							WHERE time_diff > 3 AND type != 'networking'
+				SELECT mac_address, mac_vendor_companies.* FROM (
+					SELECT mac_address, MIN(when_recorded) AS first_recorded, MAX(when_recorded) AS last_recorded, 
+						TIMESTAMPDIFF(HOUR, MIN(when_recorded), MAX(when_recorded)) AS time_diff,
+						count(*) AS count
+						FROM mac_location_data 
+						GROUP BY mac_address
+				) AS acceptable_macs
+				JOIN mac_vendors
+					ON mac_vendors.id = LEFT(acceptable_macs.mac_address, 6)
+				JOIN mac_vendor_companies
+					ON mac_vendor_companies.id = mac_vendors.company_id
+				WHERE type != 'networking'
+				AND last_recorded >= '2020-9-01'
+				AND count > 1
 			) AS encountered_macs
 			JOIN (
 				SELECT mac_address, 
@@ -49,6 +51,7 @@ class BuildSightingData:
 			JOIN mac_vendor_companies
 				ON mac_vendor_companies.id = mac_vendors.company_id
 			WHERE YEAR(when_recorded) = 2020
+			
 			ORDER BY mac_individuals.id, when_recorded
 
 			"""

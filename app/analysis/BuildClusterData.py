@@ -8,10 +8,32 @@ class ClusterSetter:
 	locations_to_cluster = []
 	locations_to_update = []
 
+	def clear_location_ids(self):
+		LocalDatabaseService().update(
+			"""
+			UPDATE mac_location_data SET location_id = NULL
+            """, {}
+		)
+
+	def delete_unknown_locations(self):
+		LocalDatabaseService().update(
+			"""
+			DELETE FROM mac_locations 
+			WHERE id NOT IN (
+				SELECT DISTINCT location_id 
+				FROM mac_location_data 
+				WHERE location_id is not NULL 
+				ORDER BY location_id ASC
+			) AND name = 'UNKNOWN LOCATION'
+			""", {}
+		)
+
 	def set_known_cluster_points(self):
 		results = LocalDatabaseService().get_all_rows(
 			"""
-			SELECT id, latitude, longitude, location_radius FROM mac_locations
+			SELECT id, latitude, longitude, location_radius 
+			FROM mac_locations 
+			WHERE type IS NOT NULL
 			"""
 		)
 		self.known_cluster_points = [
@@ -56,18 +78,8 @@ class ClusterSetter:
 						"latitude": location_to_cluster.get('latitude'),
 						"longitude": location_to_cluster.get('longitude')
 					})
+					break
 		self.update_locations()
-
-	def process(self):
-		# process known cluster points
-		self.set_known_cluster_points()
-		self.set_locations_to_cluster()
-		self.run_cluster_process()
-
-		# process unknown_cluster points
-		self.set_unknown_cluster_points()
-		self.insert_unknown_cluster_points()
-		self.run_cluster_process()
 
 	def update_locations(self):
 		LocalDatabaseService().update_many(
@@ -79,10 +91,13 @@ class ClusterSetter:
 	def set_unknown_cluster_points(self):
 		results = LocalDatabaseService().get_all_rows(
 			"""
-			SELECT ROUND(latitude, 3),  ROUND(longitude, 3), count(*) 
-			FROM mac_location_data 
-			WHERE location_id IS NULL
-			GROUP BY  ROUND(latitude, 3), ROUND(longitude, 3) 
+			SELECT latitude, longitude, count(*) FROM (
+				SELECT mac_address, ROUND(latitude, 3) AS latitude,  ROUND(longitude, 3) AS longitude
+				FROM mac_location_data 
+				WHERE location_id IS NULL
+				GROUP BY  ROUND(latitude, 3), ROUND(longitude, 3), mac_address
+			) AS seen_macs
+			GROUP BY latitude, longitude
 			ORDER BY count(*) DESC
 			"""
 		)
@@ -91,7 +106,7 @@ class ClusterSetter:
 				"name": "UNKNOWN LOCATION",
 				"latitude": result[0],
 				"longitude": result[1]
-			} for result in results if result[2] >= 50
+			} for result in results if result[2] >= 100
 		]
 
 	def insert_unknown_cluster_points(self):
@@ -102,6 +117,22 @@ class ClusterSetter:
 			""", self.unknown_cluster_points
 		)
 		print('Added %s new clusters' % len(self.unknown_cluster_points))
+
+	def process(self):
+		self.clear_location_ids()
+
+		# process known cluster points
+		self.set_known_cluster_points()
+		self.set_locations_to_cluster()
+		self.run_cluster_process()
+
+		return
+		# process unknown_cluster points
+		self.set_unknown_cluster_points()
+		self.insert_unknown_cluster_points()
+		self.run_cluster_process()
+
+		self.delete_unknown_locations()
 
 
 if __name__ == '__main__':
