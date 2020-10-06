@@ -107,7 +107,6 @@ EVENT_TYPES = (
     (0x03, "Absolute"),
     (0x04, "Misc"),
     (0x05, "Switch"),
-    (0x11, "LED"),
     (0x12, "Sound"),
     (0x14, "Repeat"),
     (0x15, "ForceFeedback"),
@@ -1037,7 +1036,6 @@ class InputDevice(object):  # pylint: disable=useless-object-inheritance
         self.manager = manager
         self.__pipe = None
         self._listener = None
-        self.leds = None
         if device_path:
             self._device_path = device_path
         else:
@@ -1078,7 +1076,6 @@ class InputDevice(object):  # pylint: disable=useless-object-inheritance
             with open("/sys/class/input/%s/device/name" %
                       self.get_char_name()) as name_file:
                 self.name = name_file.read().strip()
-            self.leds = []
 
     def _get_path_infomation(self):
         """Get useful infomation from the device path."""
@@ -1264,8 +1261,6 @@ class DeviceManager(object):  # pylint: disable=useless-object-inheritance
         self.gamepads = []
         self.other_devices = []
         self.all_devices = []
-        self.leds = []
-        self.microbits = []
         self.xinput = None
         self.xinput_dll = None
         self._post_init()
