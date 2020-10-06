@@ -107,6 +107,7 @@ EVENT_TYPES = (
     (0x03, "Absolute"),
     (0x04, "Misc"),
     (0x05, "Switch"),
+    (0x11, "LED"),
     (0x12, "Sound"),
     (0x14, "Repeat"),
     (0x15, "ForceFeedback"),
@@ -908,6 +909,7 @@ class BaseListener(object):  # pylint: disable=useless-object-inheritance
             self.update_timeval()
             timeval = self.timeval
         try:
+            print(event_type)
             event_code = self.type_codes[event_type]
         except KeyError:
             raise UnknownEventType(
