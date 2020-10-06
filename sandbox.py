@@ -22,8 +22,6 @@ keypad_inputs = {
 }
 
 
-
-
 def main():
     """Just print out some event infomation when keys are pressed."""
     while 1:
@@ -33,7 +31,12 @@ def main():
                 key_pressed = keypad_inputs.get(event.code, None)
                 if key_pressed is None:
                     continue
-                print(event.code)
+                if keypad_inputs[event.code] == 0:
+                    print(event.code)
+                    keypad_inputs[event.code] = 1
+                else:
+                    keypad_inputs[event.code] = 0
+
 
 if __name__ == "__main__":
     main()
