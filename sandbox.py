@@ -30,10 +30,10 @@ def main():
             for event in events:
                 key_pressed = keypad_inputs.get(event.code, None)
                 if key_pressed is None:
-                    print(event.code, '\n')
+                    print(event.code)
                     continue
                 if keypad_inputs[event.code] == 0:
-                    print(event.code)
+                    print(event.code, '\n')
                     keypad_inputs[event.code] = 1
                 else:
                     keypad_inputs[event.code] = 0
