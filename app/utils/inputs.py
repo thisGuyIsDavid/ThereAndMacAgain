@@ -910,7 +910,6 @@ class BaseListener(object):  # pylint: disable=useless-object-inheritance
             timeval = self.timeval
         try:
             event_code = self.type_codes[event_type]
-            print(event_code)
         except KeyError:
             raise UnknownEventType(
                 "We don't know what kind of event a %s is." % event_type)
@@ -1414,13 +1413,8 @@ class DeviceManager(object):  # pylint: disable=useless-object-inheritance
             raise UnknownEventType("We don't know this event type")
 
     def get_event_string(self, evtype, code):
-        """Get the string name of the event."""
-        if WIN and evtype == 'Key':
-            # If we can map the code to a common one then do it
-            try:
-                code = self.codes['wincodes'][code]
-            except KeyError:
-                pass
+        if evtype == 'LED':
+            return
         try:
             return self.codes[evtype][code]
         except KeyError:
