@@ -909,10 +909,8 @@ class BaseListener(object):  # pylint: disable=useless-object-inheritance
             self.update_timeval()
             timeval = self.timeval
         try:
-            if event_type == 'LED':
-                return
-            print(event_type)
             event_code = self.type_codes[event_type]
+            print(event_code)
         except KeyError:
             raise UnknownEventType(
                 "We don't know what kind of event a %s is." % event_type)
