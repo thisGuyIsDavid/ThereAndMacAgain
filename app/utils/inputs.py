@@ -1,25 +1,20 @@
-from __future__ import print_function
 from __future__ import division
+from __future__ import print_function
 
-import os
-import sys
-import io
-import glob
-import struct
-import platform
-import math
-import time
-import codecs
-from warnings import warn
-from itertools import count
-from operator import itemgetter
-from multiprocessing import Process, Pipe
 import ctypes
+import glob
+import io
+import math
+import os
+import platform
+import struct
+import sys
+import time
+from multiprocessing import Process, Pipe
+from warnings import warn
 
 __version__ = "0.5"
 
-WIN = True if platform.system() == 'Windows' else False
-MAC = True if platform.system() == 'Darwin' else False
 NIX = True if platform.system() == 'Linux' else False
 
 DWORD = ctypes.c_ulong
@@ -27,11 +22,8 @@ HANDLE = ctypes.c_void_p
 WPARAM = ctypes.c_ulonglong
 LPARAM = ctypes.c_ulonglong
 MSG = ctypes.Structure
-
-if NIX:
-    from fcntl import ioctl
-
 OLD = sys.version_info < (3, 4)
+
 
 PERMISSIONS_ERROR_TEXT = (
     "The user (that this program is being run as) does "
@@ -773,43 +765,6 @@ QUARTZ_MOUSE_PATH = "/dev/input/by-id/usb-Quartz_Mouse-event-mouse"
 APPKIT_MOUSE_PATH = "/dev/input/by-id/usb-AppKit_Mouse-event-mouse"
 
 
-# Now comes all the structs we need to parse the infomation coming
-# from Windows.
-
-
-class KBDLLHookStruct(ctypes.Structure):
-    """Contains information about a low-level keyboard input event.
-
-    For full details see Microsoft's documentation:
-
-    https://msdn.microsoft.com/en-us/library/windows/desktop/
-    ms644967%28v=vs.85%29.aspx
-    """
-    # pylint: disable=too-few-public-methods
-    _fields_ = [("vk_code", DWORD),
-                ("scan_code", DWORD),
-                ("flags", DWORD),
-                ("time", ctypes.c_int)]
-
-
-class MSLLHookStruct(ctypes.Structure):
-    """Contains information about a low-level mouse input event.
-
-    For full details see Microsoft's documentation:
-
-    https://msdn.microsoft.com/en-us/library/windows/desktop/
-    ms644970%28v=vs.85%29.aspx
-    """
-    # pylint: disable=too-few-public-methods
-    _fields_ = [("x_pos", ctypes.c_long),
-                ("y_pos", ctypes.c_long),
-                ('reserved', ctypes.c_short),
-                ('mousedata', ctypes.c_short),
-                ("flags", DWORD),
-                ("time", DWORD),
-                ("extrainfo", ctypes.c_ulong)]
-
-
 if sys.version_info.major == 2:
     # pylint: disable=redefined-builtin
     class PermissionError(IOError):
@@ -940,9 +895,6 @@ class BaseListener(object):  # pylint: disable=useless-object-inheritance
             code = 0x07
         else:
             code = 0x08
-
-        if WIN:
-            data = data // 120
 
         return self.create_event_object(
             "Relative",
@@ -1099,9 +1051,6 @@ class InputDevice(object):  # pylint: disable=useless-object-inheritance
     @property
     def _character_device(self):
         if not self._character_file:
-            if WIN:
-                self._character_file = io.BytesIO()
-                return self._character_file
             try:
                 self._character_file = io.open(
                     self._character_device_path, 'rb')
@@ -1186,10 +1135,7 @@ class InputDevice(object):  # pylint: disable=useless-object-inheritance
         return self.__pipe
 
     def __del__(self):
-        if 'WIN' in globals() or 'MAC' in globals():
-            if WIN or MAC:
-                if self.__pipe:
-                    self._listener.terminate()
+        pass
 
 
 class Keyboard(InputDevice):
@@ -1200,8 +1146,6 @@ class Keyboard(InputDevice):
     """
     def _set_device_path(self):
         super(Keyboard, self)._set_device_path()
-        if MAC:
-            self._device_path = APPKIT_KB_PATH
 
     def _set_name(self):
         super(Keyboard, self)._set_name()
@@ -1294,66 +1238,6 @@ class DeviceManager(object):  # pylint: disable=useless-object-inheritance
             self.other_devices.append(OtherDevice(self,
                                                   device_path,
                                                   char_path_override))
-
-    def _find_xinput(self):
-        """Find most recent xinput library."""
-        for dll in XINPUT_DLL_NAMES:
-            try:
-                self.xinput = getattr(ctypes.windll, dll)
-            except OSError:
-                pass
-            else:
-                # We found an xinput driver
-                self.xinput_dll = dll
-                break
-        else:
-            # We didn't find an xinput library
-            warn(
-                "No xinput driver dll found, gamepads not supported.",
-                RuntimeWarning)
-
-    def _count_devices(self):
-        """See what Windows' GetRawInputDeviceList wants to tell us.
-
-        For now, we are just seeing if there is at least one keyboard
-        and/or mouse attached.
-
-        GetRawInputDeviceList could be used to help distinguish between
-        different keyboards and mice on the system in the way Linux
-        can. However, Roma uno die non est condita.
-
-        """
-        number_of_devices = ctypes.c_uint()
-
-        if ctypes.windll.user32.GetRawInputDeviceList(
-                ctypes.POINTER(ctypes.c_int)(),
-                ctypes.byref(number_of_devices),
-                ctypes.sizeof(RawInputDeviceList)) == -1:
-            warn("Call to GetRawInputDeviceList was unsuccessful."
-                 "We have no idea if a mouse or keyboard is attached.",
-                 RuntimeWarning)
-            return
-
-        devices_found = (RawInputDeviceList * number_of_devices.value)()
-
-        if ctypes.windll.user32.GetRawInputDeviceList(
-                devices_found,
-                ctypes.byref(number_of_devices),
-                ctypes.sizeof(RawInputDeviceList)) == -1:
-            warn("Call to GetRawInputDeviceList was unsuccessful."
-                 "We have no idea if a mouse or keyboard is attached.",
-                 RuntimeWarning)
-            return
-
-        for device in devices_found:
-            if device.dwType == 0:
-                self._raw_device_counts['mice'] += 1
-            elif device.dwType == 1:
-                self._raw_device_counts['keyboards'] += 1
-            elif device.dwType == 2:
-                self._raw_device_counts['otherhid'] += 1
-            else:
-                self._raw_device_counts['unknown'] += 1
 
     def _find_devices(self):
         """Find available devices."""
